@@ -26,7 +26,7 @@ tree-sitter.workspace = true
 tree-sitter-sfapex.workspace = true
 
 [dev-dependencies]
-jsonschema = { version = "=0.33.0", default-features = false }
+jsonschema = { version = "=0.61.2", default-features = false }
 # The reuse tests hold a pack cut short to the stages that read it.
 sf-impact-changed = { path = "../sf-impact-changed" }
 sf-impact-tests = { path = "../sf-impact-tests" }
