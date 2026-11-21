@@ -15,4 +15,4 @@ serde_json.workspace = true
 sf-impact-common = { path = "../sf-impact-common" }
 
 [dev-dependencies]
-jsonschema = { version = "=0.33.0", default-features = false }
+jsonschema = { version = "=0.61.2", default-features = false }
