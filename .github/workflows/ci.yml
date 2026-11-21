@@ -1,0 +1,71 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || format('ci-run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {}
+
+jobs:
+  check:
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Toolchain
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal \
+            --component rustfmt --component clippy \
+            --target x86_64-unknown-linux-musl
+          rustup default 1.100.0
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends musl-tools shellcheck wget busybox-static
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          scripts/install-cargo-about.sh "$RUNNER_TEMP/tools"
+          echo "$RUNNER_TEMP/tools" >> "$GITHUB_PATH"
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo test --locked
+      - name: Release scripts and workflows
+        run: |
+          actionlint .github/workflows/*.yml
+          shellcheck install.sh scripts/check-static.sh scripts/licenses.sh scripts/install-cargo-about.sh
+          python3 scripts/test-release.py
+          python3 scripts/test-release-tag.py
+          scripts/licenses.sh
+          git diff --exit-code -- THIRD_PARTY_LICENSES
+          python3 scripts/test-license-gate.py
+          python3 scripts/test-license-notices.py
+      - name: Static musl release and packaging dry-run
+        run: |
+          cargo build --release --workspace --bins --locked --target x86_64-unknown-linux-musl
+          scripts/check-static.sh target/x86_64-unknown-linux-musl/release
+          python3 scripts/package-release.py x86_64-unknown-linux-musl target/x86_64-unknown-linux-musl/release dist
+          (cd dist && sha256sum --check ./*.sha256)
+
+  installer-macos:
+    permissions:
+      contents: read
+    if: github.event_name != 'pull_request'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Real macOS installer, curl, wget, BSD utilities and shasum
+        run: |
+          if ! command -v wget >/dev/null 2>&1; then
+            brew install wget
+          fi
+          # InstallTest uses the host's actual uname, never the platform double.
+          python3 scripts/test-release.py InstallTest

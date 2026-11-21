@@ -1,0 +1,19 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"f6a5f740ad9676b42e9688cd4b13d7d9c65cc176","head":"602e67f786dd5f6a0556d46582eee88935224799","head_tree":"82dc6d0b8ccaa748cefc8a4d90316ef447592e72","root":"project","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"f6a5f740ad9676b42e9688cd4b13d7d9c65cc176","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"602e67f786dd5f6a0556d46582eee88935224799","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"added","base":null,"head":{"file":"../outside.txt","id":"e3d1346e97b25522f5d7ada6911f0dc4f1cf5d41","mode":"100644","binary":false}}
+{"row":"file","status":"added","base":null,"head":{"file":"app/classes/Café.cls","id":"20f05cc3439715b9e79a87a12cece7d734fcfc78","mode":"100644","binary":false}}
+{"row":"file","status":"modified","base":{"file":"app/classes/Steps.cls","id":"96dc3c54564235f7a58ab4abe05f26e3ba96bc5e","mode":"100644","binary":false},"head":{"file":"app/classes/Steps.cls","id":"5b375bfe3caf0a9c818200b3fd6767e37c0a253b","mode":"100644","binary":false},"hunks":[{"base_start":3,"base_lines":2,"head_start":2,"head_lines":0},{"base_start":6,"base_lines":1,"head_start":3,"head_lines":0},{"base_start":7,"base_lines":0,"head_start":5,"head_lines":1},{"base_start":9,"base_lines":0,"head_start":8,"head_lines":1}]}
+{"row":"file","status":"modified","base":{"file":"app/logo.png","id":"730edd8a97ad7a705332b40fb55d7a2727de889f","mode":"100644","binary":true},"head":{"file":"app/logo.png","id":"5bb6937c5620b8caac403bb5b931994935866bc9","mode":"100644","binary":true}}
+{"row":"file","status":"moved","base":{"file":"app/old/Same.cls","id":"080529ed0508bad9ebe340f30469ac725d2826bd","mode":"100644","binary":false},"head":{"file":"app/new/Same.cls","id":"080529ed0508bad9ebe340f30469ac725d2826bd","mode":"100644","binary":false},"new_directory":"app/new"}
+{"row":"file","status":"added","base":null,"head":{"file":"app/new/Wound.cls","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","mode":"100644","binary":false},"new_directory":"app/new"}
+{"row":"file","status":"deleted","base":{"file":"app/old/Wound.cls","id":"0eb05ff27639bbdd7b1ccc6bd31271d1e63adb38","mode":"100644","binary":false},"head":null}
+{"row":"file","status":"modified","base":{"file":"app/vendor","id":"1111111111111111111111111111111111111111","mode":"160000","binary":false},"head":{"file":"app/vendor","id":"2222222222222222222222222222222222222222","mode":"160000","binary":false}}
+{"row":"blob","id":"080529ed0508bad9ebe340f30469ac725d2826bd","text":"public class Same {\n}\n"}
+{"row":"blob","id":"0eb05ff27639bbdd7b1ccc6bd31271d1e63adb38","text":"public class Alpha {\r\n    public Integer first() {\r\n        return 1;\r\n    }\r\n\r\n    public Integer second() {\r\n        return 2;\r\n    }\r\n}\r\n"}
+{"row":"blob","id":"20f05cc3439715b9e79a87a12cece7d734fcfc78","text":"public class Cafe {\n}\n"}
+{"row":"blob","id":"5b375bfe3caf0a9c818200b3fd6767e37c0a253b","text":"public class Steps {\n    public void run() {\n        c();\n        b();\n        a();\n        b();\n        a();\n        c();\n    }\n}\n"}
+{"row":"blob","id":"96dc3c54564235f7a58ab4abe05f26e3ba96bc5e","text":"public class Steps {\n    public void run() {\n        a();\n        b();\n        c();\n        a();\n        b();\n        b();\n        a();\n    }\n}\n"}
+{"row":"blob","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 20;\n    }\n}\n"}
+{"row":"blob","id":"e3d1346e97b25522f5d7ada6911f0dc4f1cf5d41","text":"Not in the project.\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

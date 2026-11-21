@@ -1,0 +1,19 @@
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <start><object>shipment__c</object><triggerFields>Weight__c</triggerFields></start>
+    <variables><name>parcel</name><objectType>Parcel__c</objectType></variables>
+    <recordUpdates><inputReference>parcel</inputReference><inputAssignments><field>Weight__c</field></inputAssignments></recordUpdates>
+    <formulas><expression>$Record.Delivered__c</expression></formulas>
+    <formulas><expression>$Record__Prior.Tracking_Id__c</expression></formulas>
+    <formulas><expression>parcel.Fragile__c</expression></formulas>
+    <formulas><expression>$Label.Shipment_Title</expression></formulas>
+    <formulas><expression>$Permission.waive_shipping_fee</expression></formulas>
+    <formulas><expression>$Setup.Shipping_Settings__c.Default_Region__c</expression></formulas>
+    <formulas><expression>$CustomMetadata.Shipping_Plugin__MDT.Standard.Enabled__c</expression></formulas>
+    <formulas><expression>$Record.Carrier__r.Region__c</expression></formulas>
+    <formulas><expression>$Record.Payer__r.Region__c</expression></formulas>
+    <formulas><expression>$Record.Payer__r.No__c</expression></formulas>
+    <formulas><expression>$Record.Payer__r.Name</expression></formulas>
+    <formulas><expression>$Record.Name</expression></formulas>
+    <formulas><expression>unknown.Weight__c</expression></formulas>
+    <recordLookups><object>Account</object><queriedFields>Name</queriedFields></recordLookups>
+</Flow>

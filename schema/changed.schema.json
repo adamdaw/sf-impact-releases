@@ -1,0 +1,419 @@
+{
+  "$id": "https://raw.githubusercontent.com/adamdaw/sf-impact-releases/main/schema/changed.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "changed.jsonl row",
+  "description": "One line of changed.jsonl, the output of `sf-impact-changed`. The file is JSON Lines: each line is one object that is valid against this schema. It says what the difference between two commits, the base and the head, touches in a Salesforce DX project: the files that differ, the symbols the difference adds, modifies and removes, and the names in the entries of permission sets, profiles and custom metadata records that it changes. The symbols at head, and their lines, are the `declaration` rows of the refs.jsonl that `sf-impact-extract` writes for the head; the symbols at base are read from the base version of each changed file alone. The first row is the `provenance` row, which says what wrote the file and of which two files. The rows after it are sorted by `file`; the rows of one file are its `file` row, then its `symbol` rows by `start` (those without first), then its `touched` rows at base and then at head, each by `line`; rows at one place are in the order of their text. A `symbol` row for something removed from a file that moved, or that went on in an added file, is at the path the file had at base. The output is a function of two files and of nothing else: delta.jsonl, which `sf-impact-delta` writes for the two commits, and refs.jsonl, which `sf-impact-extract` writes for the tree of the head. `sf-impact-changed` reads no repository, no working tree and no environment, and runs no git; scope and config are those of the two commits, as the delta has them. The same two files always give a byte-identical file. Names compare case-insensitively, as in Apex, and are written with the case they have in the source. All integer fields require integer JSON tokens; floating tokens such as 1.0 or 1e0 are refused even when mathematically integral. Draft 2020-12 cannot express that lexical distinction; readers enforce it. Schema version 1 uses closed objects. In every row after provenance, an object with a duplicate key is refused. Provenance rows retain last-wins handling of duplicate keys. Readers refuse unknown schema versions; any added field, including an optional field, requires a schema version bump.",
+  "oneOf": [
+    { "$ref": "#/$defs/provenance" },
+    { "$ref": "#/$defs/changed_file" },
+    { "$ref": "#/$defs/symbol" },
+    { "$ref": "#/$defs/touched" }
+  ],
+  "$defs": {
+    "changed_status": { "description": "Changed-file classification, including derived mode and type changes.", "enum": ["added", "deleted", "modified", "moved", "mode_changed", "type_changed"] },
+    "provenance": {
+      "description": "What wrote the file, and of what: the first row of the file, and the only one of its kind. Before it maps anything, `sf-impact-changed` reads the first row of delta.jsonl and of refs.jsonl and holds the one to the other. The refs have to be of the head of the delta: `tree` says the commit that is the head, or a tree that is the tree of the head; and `root`, `scope` and `config` are the same in both. Each file has to be of a `schema` version that the tool knows. Anything else is refused in one line that names the field, what each file has for it, and what to run. A file without its first row is refused as of an older format. `sf-impact-tests` holds the refs.jsonl it is given to this row in the same way. Each tool first holds every row it reads to its schema, and refuses one that is not valid against it, so that no value that is not valid is carried from one file into the next. For this row that takes in what its fields say of each other: `base`, `head`, `head_tree`, `root`, `scope` and `config` are those of `inputs.delta`; `inputs.refs` are of that head, or of a tree that is no commit's; and `confidence` is `full` in the first case and `partial`, with its gap, in the second. The row holds no time, no name of a machine and no path of one, so the same two files still give a byte-identical file.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "provenance" },
+        "tool": {
+          "description": "The tool that wrote the file: `sf-impact-changed`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "description": "The version of that tool, as its `--version` prints it. It says what wrote the file; what a tool reads is decided by `schema`.",
+          "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([-+][\\s\\S]*)?$"
+        },
+        "schema": {
+          "description": "The version of this schema that the file is valid against: 1, the first to have this row. A tool refuses a file of a version it does not know. A file that does not start with this row is of the format before version 1 and is refused too.",
+          "type": "integer", "const": 1
+        },
+        "base": {
+          "description": "The full id of the commit compared from, as the delta has it.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "head": {
+          "description": "The full id of the commit compared to, as the delta has it. Refs that go with this file are of this commit.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "head_tree": {
+          "description": "The id of the tree of the head, as the delta has it. Refs of another commit with this tree are refs of the head too.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "root": {
+          "description": "Where the project is in the repository, as the delta has it. Refs that go with this file are of the same root.",
+          "$ref": "#/$defs/provenance_root"
+        },
+        "scope": {
+          "description": "What the sfdx-project.json of the head declares: the same in the delta and in the refs.",
+          "$ref": "#/$defs/provenance_scope"
+        },
+        "config": {
+          "description": "The config of the head: the same in the delta and in the refs.",
+          "$ref": "#/$defs/provenance_config"
+        },
+        "confidence": {
+          "description": "`full`: the refs were verified to be of the head of the delta. `partial`: they were not, for the reason in `gaps`, and were mapped all the same because the tool was told to. The confidence of the whole file is `partial` if any row says so, this one too.",
+          "enum": ["full", "partial"]
+        },
+        "gaps": {
+          "description": "Present where `confidence` is `partial`, and only there. `unverified_refs`: the refs were of a tree that is `dirty` or `unknown` (see `inputs`), which cannot be known to be the head, and `--accept-unverified-refs` was given. The declarations and lines that the difference was mapped onto may not be those of the head. `sf-impact-tests` gives this as a reason for the partial confidence of what it writes.",
+          "type": "array",
+          "items": { "enum": ["unverified_refs"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "inputs": {
+          "description": "The first rows of the two files that were read, as they are, each without its `row`. Each is valid by the schema of its file.",
+          "type": "object",
+          "properties": {
+            "refs": { "$ref": "#/$defs/refs_provenance" },
+            "delta": { "$ref": "#/$defs/delta_provenance" }
+          },
+          "required": ["refs", "delta"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["row", "tool", "version", "schema", "base", "head", "head_tree", "root", "scope", "config", "confidence", "inputs"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "confidence": { "const": "partial" } } },
+          "then": { "required": ["gaps"] },
+          "else": { "not": { "required": ["gaps"] } }
+        }
+      ]
+    },
+    "refs_provenance": {
+      "description": "The first row of the refs.jsonl that was read, without its `row`: refs.schema.json says what each field is.",
+      "type": "object",
+      "properties": {
+        "tool": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([-+][\\s\\S]*)?$" },
+        "schema": { "type": "integer", "const": 2 },
+        "tree": { "$ref": "#/$defs/provenance_tree" },
+        "root": { "oneOf": [{ "$ref": "#/$defs/provenance_root" }, { "type": "null" }] },
+        "scope": { "$ref": "#/$defs/provenance_scope" },
+        "config": { "$ref": "#/$defs/provenance_config" }
+      },
+      "required": ["tool", "version", "schema", "tree", "root", "scope", "config"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "tree": { "properties": { "state": { "const": "unknown" } } } } },
+          "else": { "properties": { "root": { "type": "string" } } }
+        }
+      ]
+    },
+    "delta_provenance": {
+      "description": "The first row of the delta.jsonl that was read, without its `row`: delta.schema.json says what each field is. Its `scope` and `config` are never null here: a delta whose head has no project file or no config that can be read is refused.",
+      "type": "object",
+      "properties": {
+        "tool": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([-+][\\s\\S]*)?$" },
+        "schema": { "type": "integer", "const": 1 },
+        "base": { "$ref": "#/$defs/provenance_id" },
+        "head": { "$ref": "#/$defs/provenance_id" },
+        "head_tree": { "$ref": "#/$defs/provenance_id" },
+        "root": { "$ref": "#/$defs/provenance_root" },
+        "scope": { "$ref": "#/$defs/provenance_scope" },
+        "config": { "$ref": "#/$defs/provenance_config" }
+      },
+      "required": ["tool", "version", "schema", "base", "head", "head_tree", "root", "scope", "config"],
+      "additionalProperties": false
+    },
+    "provenance_tree": {
+      "description": "The tree that was read, as far as it is known. Before it reads a file, `sf-impact-extract` asks git which commit is checked out where `--root` is and what that commit holds (`rev-parse`, `ls-tree`): plumbing that reads and writes nothing, run without any `GIT_*` variable of the caller's and without the user's and the system's configuration, as `sf-impact-delta` runs it. It asks git nothing after. What it reads is sfdx-project.json, sf-impact.json if there is one, and every file under the scope directories, each once, and of the bytes that it read of each it works out the id that git gives such content, itself. Those ids and the set of files are held to the commit. So the comparison is of the very bytes that the rows are made of, and a file that changes while the tool runs is the commit's only if what was read of it is. Nothing else counts: a file outside the scope is not read, whatever git says of it, and a file in scope that the commit does not have counts though git ignores it. A file's mode is not content. Refs are of the head of a delta if `commit` is its head or `tree` is the tree of its head, and `root` is its `root`.",
+      "oneOf": [
+        {
+          "description": "Every file that was read is as this commit has it, and the commit has no file in scope that was not read: the tree is a clean checkout of the commit, as far as it was read.",
+          "type": "object",
+          "properties": {
+            "state": { "const": "commit" },
+            "commit": {
+              "description": "The full id of the commit that is checked out.",
+              "$ref": "#/$defs/provenance_id"
+            },
+            "tree": {
+              "description": "The id of the tree of that commit. Another commit with the same tree has the same content: the commit rebased, amended or squashed without a change. Refs of this commit are refs of that one. One commit has one tree: refs that name the head of a delta and another tree than it has are refused.",
+              "$ref": "#/$defs/provenance_id"
+            }
+          },
+          "required": ["state", "commit", "tree"],
+          "additionalProperties": false
+        },
+        {
+          "description": "`dirty`: the root is in a repository with a commit checked out, and what was read is not what that commit has: a file in scope is changed, new, ignored or gone, or the commit has a directory in scope that is not on disk. `sf-impact-extract` says which file on standard error. `unknown`: no commit could be read: the root is in no repository, the repository has no commit, there is no git, or git refuses the repository because another user owns it (`--trust-repo` has it read). Neither can be verified to be of any commit. `sf-impact-changed` and `sf-impact-tests` refuse such refs with a delta, unless they are told to use them as they are (`--accept-unverified-refs`), and then say in their output that they did.",
+          "type": "object",
+          "properties": {
+            "state": { "enum": ["dirty", "unknown"] }
+          },
+          "required": ["state"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "provenance_id": {
+      "description": "The id of a git object, in full: 40 hexadecimal digits, or 64 in a repository that uses SHA-256.",
+      "type": "string",
+      "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "provenance_root": {
+      "description": "Where the project is in its repository: the path of the directory that holds sfdx-project.json, from the top of the repository, with `/` between its parts and without `.` segments or a trailing separator; `.` where the project is at the top. Never a path of the machine. One commit can hold several projects, each declaring the same directories: this is what tells the refs of one from the refs of another.",
+      "type": "string",
+      "pattern": "^(?:\\.|(?:[^/\\\\]*[^/\\\\.:]|[^/\\\\]*[^./\\\\]\\.+|\\.{3,})(?:/(?:[^/\\\\]*[^./\\\\][^/\\\\]*|\\.{3,}))*)$"
+    },
+    "provenance_scope": {
+      "description": "The scope directories that sfdx-project.json declares, as paths from the root with `/` separators and without `.` segments or a trailing separator, as every `package` is written. Each list is sorted by the bytes of the paths and has each path once. A declared path that leaves the root, absolute or with `..`, holds nothing in scope and is in neither list. A directory that both keys name is in `packageDirectories` alone. A declared directory that is not on disk is still declared, and is listed. An empty scope path denotes the project root.",
+      "type": "object",
+      "properties": {
+        "packageDirectories": {
+          "description": "The `path` of every entry of `packageDirectories`.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "unpackagedMetadata": {
+          "description": "The `unpackagedMetadata.path` of every entry of `packageDirectories` that has one.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["packageDirectories", "unpackagedMetadata"],
+      "additionalProperties": false
+    },
+    "provenance_config": {
+      "description": "A hash of the config as it takes effect, not of the file sf-impact.json as it is written: 16 hexadecimal digits in lower case, the FNV-1a hash of 64 bits of the UTF-8 text `{\"namespaces\":[..],\"textualAllowList\":[..],\"textualMinLength\":n}`, written without white space, each list with its names in ASCII lower case, sorted by their bytes, each once. So a tree with no config file, one with `{}` and one that states the defaults all hash as `4e7844462778448c`, and keys that are for other tools change nothing. It tells two configs apart. It is no protection against a file made to deceive, and neither is the rest of the row.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "changed_file": {
+      "description": "A file that differs between the base and the head: one row for every `file` row of delta.jsonl, in scope or not, whatever became of the file, so that nothing that changed is left out. What the change comes to is in the `symbol` and `touched` rows of the same file, if it has any. A file that only moved, within one package directory, has none: it changes no symbol. Neither has a file whose mode alone changed. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "file" },
+        "file": { "$ref": "#/$defs/path" },
+        "previous_file": {
+          "description": "Present for `status` `moved`, and for no other: the path of the file at base.",
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "description": "What became of the file, as delta.jsonl has it. `added`: not at base. `deleted`: not at head; `file` is its path at base. `modified`: at the same path in both, with different content. `moved`: the very same content at head under another path than at base. No two files are taken for one because they are alike: a file that moved and changed is one `deleted` and one `added`. Where those two declare the same symbol they are read as one file all the same: see `symbol`. `mode_changed`: the same content at the same path with another file mode; nothing that is read changed, so the row has no gaps and the file no other rows. `type_changed`: a regular file became a symbolic link or a submodule, or the reverse; neither is read, so what the file declared is removed, or what it declares is added.",
+          "$ref": "#/$defs/changed_status"
+        },
+        "binary": {
+          "description": "Present, and true, where the content changed and there are no lines for the change: a version of the file is binary, or the file changed type. A regular version is binary if it is not text. A file is text if and only if it is valid UTF-8, or UTF-16 (LE or BE) with a BOM that decodes without error, and the decoded content contains no NUL (U+0000). The change cannot be mapped by line. A file that declares symbols has every one of them marked, with `reason` `whole_file`.",
+          "const": true
+        },
+        "package": {
+          "description": "The scope directory the file is under: a `packageDirectories` path or an `unpackagedMetadata` path of sfdx-project.json, relative to the root, with `/` separators; the nearest where they nest. The project file is read from the head commit for the path at head, and from the base commit for the path at base, so a file deleted from a directory that the head no longer declares is still in scope. Null for a file that is in no scope directory at head or at base: it is out of scope, nothing is read from it, and it is listed so that it is not passed over in silence.",
+          "type": ["string", "null"]
+        },
+        "confidence": {
+          "description": "`full`: the rows of this file are all that the model has to say of its change; so for a file that is out of scope, unless it is the project file and moves the scope. `partial`: they may not be, for the reasons in `gaps`. The confidence of the whole file changed.jsonl is `partial` if any row says so.",
+          "enum": ["full", "partial"]
+        },
+        "gaps": {
+          "description": "Present where `confidence` is `partial`, and only there: why, sorted, each once. `unmodelled_file`: the file is a metadata component of a type that is not modelled, the file that has an `unmodelled_file` row in refs.jsonl, at head or at base: a layout, a tab, a static resource's metadata. Its change marks no symbol. `no_declaration`: the file is in scope and nothing the model knows is declared in it at base or at head: a static resource, an Aura file, a text file, an Apex file that holds no type; or the `-meta.xml` companion of an Apex file that is not there or declares nothing; or a submodule or a symbolic link, a package directory that is one among them, which is not read and not followed. Its change marks no symbol. `parse_error`: the base or the head version of the file did not parse cleanly, so the declarations read from it may be incomplete, and with them what is added, removed and marked. A file of an LWC bundle that did not parse cleanly has the gap too, though the bundle is marked all the same. `unsupported_element`: in a permission set, a profile or a custom metadata record, a changed entry holds an element that was not read (an `unsupported_element` of refs.jsonl), so what that entry names is not among the `touched` rows; or the head version of a changed Flow holds an element that was not read, so what the Flow names may be incomplete. An `unsupported_element` in a Flow that did not change is no gap. `scope_changed`: on the row of sfdx-project.json, and on no other: the scope directories it declares at head are not those it declared at base. Files that did not change are in scope where they were not, out of scope where they were in it, or in another package directory, where a nested one was added or removed, so that what they declare is added, removed or another symbol. None of them is in the difference, and none has a row: this gap is all that says so.",
+          "type": "array",
+          "items": { "enum": ["unmodelled_file", "no_declaration", "parse_error", "unsupported_element", "scope_changed"] },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["row", "file", "status", "package", "confidence"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "moved" } } },
+          "then": { "required": ["previous_file"] },
+          "else": { "not": { "required": ["previous_file"] } }
+        },
+        {
+          "if": { "properties": { "confidence": { "const": "partial" } } },
+          "then": { "required": ["gaps"] },
+          "else": { "not": { "required": ["gaps"] } }
+        }
+      ]
+    },
+    "symbol": {
+      "description": "A symbol that the difference adds, modifies or removes, on the evidence of one changed file. A symbol is a declaration: at head a `declaration` row of refs.jsonl, at base what the base version of the file declares, read with the same code from the text that delta.jsonl gives. A declaration at base and one at head are the same symbol if they have the same package, kind of thing and name, ignoring case, whatever the file is called at each. The two versions compared are those of one file: a file changed in place, a file that moved, or a file that was deleted and a file that was added which are the same thing in the same package directory, because they declare the same symbol at the top, or are the `-meta.xml` companion of an Apex file of the same name. Those two are read as one file that moved and changed, and their lines are compared by `sf-impact-changed`, as delta.jsonl compares the lines of a file changed in place. So a class that moved and was edited has only what was edited marked. Where it is not one deleted file and one added file that are the same thing, but more of either, none is chosen, and what they declare is removed and added, as is a declaration that goes from one changed file to another by any other way. A symbol has one row for each changed file that marks it: an LWC bundle of which two files changed has two. Declarations of one name in several files (`collision`) are not merged and none is chosen: each has the rows that the change to its own file gives it. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "symbol" },
+        "symbol": {
+          "description": "The API name, as the `symbol` of a refs.jsonl declaration: `Invoice`, `Invoice.total()`, `Invoice.round(decimal,integer)`, `Invoice__c.Total__c`, `Label.Greeting`, the name of a Flow or of an LWC bundle. A method or constructor includes its parameter types, so a change of signature is one symbol `removed` and another `added`. Callable symbols preserve owner and member source spelling; parameter types are canonical: lowercase throughout, with System. removed from primitive and collection names, Iterable, Iterator, Object and SObject, and arrays written recursively as list<...>, without spaces. For example, Account.process(System.List<Id>) and Account.process(Id[]) both become Account.process(list<id>).",
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "description": "What kind of thing the symbol is: the `type` of a refs.jsonl declaration.",
+          "enum": [
+            "class", "interface", "enum", "trigger", "method", "constructor", "field", "enum_value",
+            "object", "object_field", "validation_rule", "label", "custom_permission", "message_channel", "permission_set", "profile", "metadata_record",
+            "flow", "lwc"
+          ]
+        },
+        "package": {
+          "description": "The scope directory that `file` is under. Part of what a symbol is: a class moved from one package directory to another is `removed` from the one and `added` to the other.",
+          "type": "string"
+        },
+        "file": {
+          "description": "The changed file that is the evidence for this row, relative to the root, with `/` separators. For `change` `removed` its path at base, otherwise its path at head. Usually the file that declares the symbol; with `reason` `whole_file` it can be another file of the same component: a file of an LWC bundle other than the one the bundle is declared in, or the `-meta.xml` companion of an Apex class or trigger.",
+          "type": "string",
+          "minLength": 1
+        },
+        "change": {
+          "description": "`added`: declared at head and not at base. `modified`: declared at both, and the change marks it. `removed`: declared at base and not at head. An LWC bundle is at base, or at head, if any file of it is.",
+          "enum": ["added", "modified", "removed"]
+        },
+        "reason": {
+          "description": "Why the symbol is in this file. `hunk`: lines that the difference changes, adds or takes away are lines of the declaration, and of no smaller declaration inside it; `hunks` lists the hunks. A line marks the innermost declaration around it: a method, a constructor, a field, an inner class, or the class where the line is in no member; declarations on the same lines are marked together. A line that a declaration starts or ends on can hold more than that declaration: another member, the rest of a class header, the end of an initializer, which has no lines of its own to be found by. Such a line cannot say which of them changed, and marks every declaration around it, the type they are in too, unless it is a line of one declaration alone: only declarations on the very same lines start or end on it, and nothing but white space is before them on their first line or after them on their last. That is read from the source of each version of the file, for its own lines. A comment after a member counts as something else on the line. Each version of the file is read by its own lines: a line that the head has new or changed marks the declaration around it at head, and a line that the base had and the head has not marks the declaration it was in at base, if the head still declares that. So an annotation taken from above a method marks the method. A hunk that leaves no line at head also marks the innermost declaration at head around the gap it leaves: lines taken out of a method mark the method, and a member that is removed whole marks the class it was in. A line outside every declaration of its file, such as a comment above a class, marks what the file declares at the top. A blank line counts like any other, and so does a change of white space alone: nothing is ignored. In a metadata file that is one component, every line is inside the declaration. `whole_file`: the file as a whole marks the symbol and no line does: the file was added or deleted; or its content changed and there are no lines for it (`binary`); or it is a file of the component other than the one with the declaration's lines, where `hunks` still lists the lines that changed: a file of an LWC bundle, or the `-meta.xml` companion of an Apex file, which marks what the Apex file of its name declares at the top, whether the companion is changed, added, deleted or moved, and for one that goes from one Apex file's name to another's both what it left and what it joined; or the symbol is new by its name or package alone, as the unchanged method of a class that was given another name, or everything in a file that moved to another package directory. `removed`: the symbol is declared in the base version of a file that is still there at head, modified or moved, or that went on in an added file (see `symbol`), and the head version no longer declares it; this goes with `change` `removed`. So it is for a file that moved to a place where it is another kind of file or out of scope: an Apex file that becomes a file of a bundle no longer declares anything. A symbol removed with its whole file has `whole_file`.",
+          "enum": ["hunk", "whole_file", "removed"]
+        },
+        "start": {
+          "description": "First line of the declaration in `file`, counting from 1, annotations and modifiers included: at base for `change` `removed`, at head otherwise. Absent, with `end`, where the lines of the declaration are not in `file`.",
+          "type": "integer",
+          "minimum": 1, "maximum": 4294967295
+        },
+        "end": {
+          "description": "Last line of the declaration in `file`, inclusive.",
+          "type": "integer",
+          "minimum": 1, "maximum": 4294967295
+        },
+        "previous_file": {
+          "description": "Present on a `modified` row whose `file` was added while the file that declared the symbol at base was deleted: the path of that file. The base lines of `hunks` are lines of it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "hunks": {
+          "description": "The hunks that mark the symbol, in the order of the file. Present with `reason` `hunk`, and with `whole_file` for a file of a component whose own lines changed. Their head lines are lines of `file`; their base lines are lines of the same file at base, or of `previous_file` where the row has one.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/hunk" },
+          "minItems": 1
+        },
+        "collision": {
+          "description": "At head, another declaration has this name, ignoring case, and is the same kind of thing: the `collision` of the refs.jsonl declaration. For `change` `removed`: at head some declaration still has this name and is the same kind of thing, in another file or another package directory, so the name is gone from here and not from the repository. Classes, interfaces and enums share one namespace.",
+          "type": "boolean"
+        }
+      },
+      "required": ["row", "symbol", "type", "package", "file", "change", "reason", "collision"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "reason": { "const": "hunk" } } },
+          "then": { "required": ["hunks", "start", "end"] }
+        },
+        {
+          "if": { "properties": { "reason": { "const": "removed" } } },
+          "then": {
+            "properties": { "change": { "const": "removed" } },
+            "required": ["start", "end"],
+            "not": { "required": ["hunks"] }
+          }
+        },
+        {
+          "if": { "required": ["start"] },
+          "then": { "required": ["end"] },
+          "else": { "not": { "required": ["end"] } }
+        }
+      ]
+    },
+    "touched": {
+      "description": "A name in an entry that the difference changes, in a permission set, a profile or a custom metadata record: a grant that is given, withdrawn or altered, or what a record binds. These are the \"grants touched\"; the reason for the row is the changed line. An entry is an element directly under the root of the file: one `<fieldPermissions>`, one `<classAccesses>`, one `<values>` of a record. A name is touched if its own line changed or if any line of its entry did, so that a change of `<readable>` touches the field that the entry names on a line of its own. Each version of the file is read on its own: `side` `head` rows are the names in the entries that have changed or added lines at head, and are `reference` rows of refs.jsonl; `side` `base` rows are the names in the entries that had changed or removed lines at base, read from the base version of the file and resolved against what the head declares. So a new grant has a row at head, a withdrawn one a row at base, and an altered one a row at each. What a custom metadata record is by its own name does not depend on a line: every change to the content of a record has a `cmdt_type` row for the type of the record, at each version the record has, and a `cmdt` row for whatever its own name names. The type is how code that queries the type as a whole is reached from a changed record. A file that only moved, with the same name in the same package directory, touches nothing. The file itself is a `symbol` row. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "touched" },
+        "referrer": {
+          "description": "The `symbol` of the permission set, profile or custom metadata record that the file declares.",
+          "type": "string",
+          "minLength": 1
+        },
+        "side": {
+          "description": "The version of the file the name was read from: `base` or `head`.",
+          "enum": ["base", "head"]
+        },
+        "kind": {
+          "description": "As the `kind` of a refs.jsonl reference. `grant`: something a permission set or profile grants access to. `cmdt_field`: a field of its type that a record sets. `cmdt`: something a record names in a value or in its own name. `cmdt_type`: the custom metadata type of a record.",
+          "enum": ["grant", "cmdt", "cmdt_field", "cmdt_type"]
+        },
+        "referenced": {
+          "description": "What is named: with `resolution` `declaration` the `symbol` of a declaration at head, otherwise the name as written.",
+          "type": "string",
+          "minLength": 1
+        },
+        "referenced_type": {
+          "description": "What kind of thing `referenced` is, as the source says: the `referenced_type` of a refs.jsonl reference.",
+          "enum": [
+            "class", "method", "constructor", "field", "enum_value", "trigger", "object", "object_field", "validation_rule",
+            "label", "custom_permission", "message_channel", "permission_set", "profile", "metadata_record", "flow", "lwc",
+            "tab", "global_value_set"
+          ]
+        },
+        "resolution": {
+          "description": "`declaration`: declared at head. `external`: in a namespace listed in the config file. `unresolved`: neither. A name read at base that the head no longer declares is `unresolved`, or `external`.",
+          "enum": ["declaration", "external", "unresolved"]
+        },
+        "candidates": {
+          "description": "Present where the name may be one of several declarations that differ: the symbols of every one, sorted, each once. None is chosen.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 2,
+          "uniqueItems": true
+        },
+        "package": {
+          "description": "The scope directory that `file` is under.",
+          "type": "string"
+        },
+        "file": {
+          "description": "The permission set, profile or record file, relative to the root: its path at base for `side` `base`, at head for `head`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "description": "Line of the name in that version of the file, counting from 1. A name that comes from the file's own name is at line 1.",
+          "type": "integer",
+          "minimum": 1, "maximum": 4294967295
+        }
+      },
+      "required": ["row", "referrer", "side", "kind", "referenced", "resolution", "package", "file", "line"],
+      "additionalProperties": false
+    },
+    "hunk": {
+      "description": "One hunk of the difference between the base and the head version of a file, without context: `@@ -base_start,base_lines +head_start,head_lines @@`, as in delta.jsonl, whose schema says how lines are compared. Nothing is ignored.",
+      "type": "object",
+      "properties": {
+        "base_start": {
+          "description": "First line of the hunk at base, counting from 1. Where `base_lines` is 0 the hunk only adds lines, and this is the line at base that they come after: 0 for the top of the file.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        },
+        "base_lines": {
+          "description": "How many lines at base the hunk replaces or takes away.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        },
+        "head_start": {
+          "description": "First line of the hunk at head, counting from 1. Where `head_lines` is 0 the hunk only takes lines away, and this is the line at head that they came after: 0 for the top of the file. Such a hunk marks the innermost declaration at head that holds both that line and the next.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        },
+        "head_lines": {
+          "description": "How many lines at head the hunk changes or adds.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        }
+      },
+      "required": ["base_start", "base_lines", "head_start", "head_lines"],
+      "additionalProperties": false
+    },
+    "path": {
+      "description": "Path of the file relative to the root, with `/` separators: at head, or for a deleted file at base. A file of the repository that is outside the root, where the project is not at the top of its repository, starts with `../`.",
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

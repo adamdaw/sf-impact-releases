@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Heavy_Needs_Go</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(Kg__c &gt; 100, NOT(Go__c))</errorConditionFormula>
+    <errorDisplayField>Go__c</errorDisplayField>
+    <errorMessage>A heavy shipment has to be cleared.</errorMessage>
+</ValidationRule>

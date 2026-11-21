@@ -1,0 +1,10 @@
+[package]
+name = "sf-impact-memcmp"
+description.workspace = true
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true

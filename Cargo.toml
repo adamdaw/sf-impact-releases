@@ -1,0 +1,41 @@
+[workspace]
+resolver = "3"
+members = ["crates/sf-impact-common", "crates/sf-impact-memcmp", "crates/sf-impact-extract", "crates/sf-impact-delta", "crates/sf-impact-changed", "crates/sf-impact-tests", "crates/sf-impact-render"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "MIT"
+repository = "https://github.com/adamdaw/sf-impact-releases"
+description = "Small command-line tools for Salesforce DX reference and change impact analysis."
+keywords = ["salesforce", "apex", "impact-analysis", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+
+[workspace.dependencies]
+# Pin the fast hasher exactly for reproducible dependency updates. Maps keyed by
+# untrusted PR content must use its seeded RandomState, never FixedState or an
+# unkeyed hasher. serde_json shares this version; updating it may require raising
+# this pin.
+foldhash = "=0.2.0"
+# Every command's allocator: musl's malloc serialises threads on one lock.
+# Pinned with libmimalloc-sys: sf_impact_common::allocator sets mimalloc's
+# purge delay by its index in mimalloc.h, which a new mimalloc may renumber.
+# On any upgrade, the purge-delay index test
+# (allocator::tests::the_index_is_the_option_named_purge_delay) must pass.
+mimalloc = { version = "=0.1.52", default-features = false }
+# For mi_option_set; the same build of mimalloc as the allocator's.
+libmimalloc-sys = { version = "=0.1.49", default-features = false, features = ["extended"] }
+rayon = "1.11"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tree-sitter = "=0.27.2"
+tree-sitter-sfapex = "=3.0.2"
+
+# Small static binaries: the target is a free-tier CI runner.
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

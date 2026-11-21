@@ -1,0 +1,24 @@
+[package]
+name = "sf-impact-changed"
+description.workspace = true
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+mimalloc.workspace = true
+serde_json.workspace = true
+sf-impact-common = { path = "../sf-impact-common" }
+sf-impact-extract = { path = "../sf-impact-extract" }
+
+[dev-dependencies]
+zstd = { version = "=0.14.4", default-features = false }
+# The pack tests reseal a pack that they alter.
+sha2 = { version = "0.11", default-features = false }
+jsonschema = { version = "=0.33.0", default-features = false }
+# The scenario tests make real repositories and need their delta.
+sf-impact-delta = { path = "../sf-impact-delta" }

@@ -1,0 +1,540 @@
+{
+  "provenance": {
+    "tool": "sf-impact-tests",
+    "version": "0.1.0",
+    "schema": 1,
+    "inputs": {
+      "refs": {
+        "tool": "sf-impact-extract",
+        "version": "0.1.0",
+        "schema": 2,
+        "tree": {
+          "state": "commit",
+          "commit": "10891241b300cc1eea7bf1b7853f2d6652f0ead0",
+          "tree": "669d89c249d94818f754eef9a1932e3f43f87422"
+        },
+        "root": ".",
+        "scope": {
+          "packageDirectories": [
+            "force-app",
+            "not-there",
+            "plugins/Billing"
+          ],
+          "unpackagedMetadata": [
+            "unpackaged"
+          ]
+        },
+        "config": "af618349b7fc383d"
+      },
+      "changed": {
+        "tool": "sf-impact-changed",
+        "version": "0.1.0",
+        "schema": 1,
+        "base": "e16b3f485ad0db99a1b01008cfaa4fda07afc0af",
+        "head": "10891241b300cc1eea7bf1b7853f2d6652f0ead0",
+        "head_tree": "669d89c249d94818f754eef9a1932e3f43f87422",
+        "root": ".",
+        "scope": {
+          "packageDirectories": [
+            "force-app",
+            "not-there",
+            "plugins/Billing"
+          ],
+          "unpackagedMetadata": [
+            "unpackaged"
+          ]
+        },
+        "config": "af618349b7fc383d",
+        "confidence": "full",
+        "inputs": {
+          "refs": {
+            "tool": "sf-impact-extract",
+            "version": "0.1.0",
+            "schema": 2,
+            "tree": {
+              "state": "commit",
+              "commit": "10891241b300cc1eea7bf1b7853f2d6652f0ead0",
+              "tree": "669d89c249d94818f754eef9a1932e3f43f87422"
+            },
+            "root": ".",
+            "scope": {
+              "packageDirectories": [
+                "force-app",
+                "not-there",
+                "plugins/Billing"
+              ],
+              "unpackagedMetadata": [
+                "unpackaged"
+              ]
+            },
+            "config": "af618349b7fc383d"
+          },
+          "delta": {
+            "tool": "sf-impact-delta",
+            "version": "0.1.0",
+            "schema": 1,
+            "base": "e16b3f485ad0db99a1b01008cfaa4fda07afc0af",
+            "head": "10891241b300cc1eea7bf1b7853f2d6652f0ead0",
+            "head_tree": "669d89c249d94818f754eef9a1932e3f43f87422",
+            "root": ".",
+            "scope": {
+              "packageDirectories": [
+                "force-app",
+                "not-there",
+                "plugins/Billing"
+              ],
+              "unpackagedMetadata": [
+                "unpackaged"
+              ]
+            },
+            "config": "af618349b7fc383d"
+          }
+        }
+      }
+    }
+  },
+  "depth": 2,
+  "seeds": [
+    {
+      "symbol": "BillingPlugin",
+      "type": "class",
+      "package": "plugins/Billing",
+      "file": "plugins/Billing/classes/BillingPlugin.cls",
+      "line": 1,
+      "scope": "packageDirectories",
+      "sources": [
+        {
+          "change": "modified",
+          "collision": false,
+          "end": 17,
+          "file": "plugins/Billing/classes/BillingPlugin.cls",
+          "hunks": [
+            {
+              "base_lines": 1,
+              "base_start": 1,
+              "head_lines": 1,
+              "head_start": 1
+            }
+          ],
+          "package": "plugins/Billing",
+          "reason": "hunk",
+          "row": "symbol",
+          "start": 1,
+          "symbol": "BillingPlugin",
+          "type": "class"
+        }
+      ],
+      "counts": {
+        "parsed": 4,
+        "textual": 6
+      },
+      "referrers": [
+        {
+          "type": "class",
+          "parsed": [],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "BillingPlugin",
+                "file": "plugins/Billing/classes/BillingPlugin.cls"
+              },
+              "references": [
+                350
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        },
+        {
+          "type": "method",
+          "parsed": [
+            {
+              "referrer": {
+                "symbol": "ExtraTests.billingRuns()",
+                "file": "unpackaged/classes/ExtraTests.cls"
+              },
+              "references": [
+                3,
+                73
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                },
+                {
+                  "target": {
+                    "symbol": "BillingPlugin.run(invoice)",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "member",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "BillingPlugin.firstSealArea()",
+                "file": "plugins/Billing/classes/BillingPlugin.cls"
+              },
+              "references": [
+                636
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin.firstSealArea()",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "member",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            },
+            {
+              "referrer": {
+                "symbol": "BillingPlugin.sealArea()",
+                "file": "plugins/Billing/classes/BillingPlugin.cls"
+              },
+              "references": [
+                655
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin.sealArea()",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "member",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            },
+            {
+              "referrer": {
+                "symbol": "ExtraTests.billingRuns()",
+                "file": "unpackaged/classes/ExtraTests.cls"
+              },
+              "references": [
+                351
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        },
+        {
+          "type": "permission_set",
+          "parsed": [
+            {
+              "referrer": {
+                "symbol": "Billing",
+                "file": "force-app/main/default/permissionsets/Billing.permissionset-meta.xml"
+              },
+              "references": [
+                181
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "Billing",
+                "file": "force-app/main/default/permissionsets/Billing.permissionset-meta.xml"
+              },
+              "references": [
+                349
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        },
+        {
+          "type": "profile",
+          "parsed": [
+            {
+              "referrer": {
+                "symbol": "Admin",
+                "file": "plugins/Billing/declarative/profiles/Admin.profile-meta.xml"
+              },
+              "references": [
+                180
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "Admin",
+                "file": "plugins/Billing/declarative/profiles/Admin.profile-meta.xml"
+              },
+              "references": [
+                348
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "BillingPlugin",
+                    "file": "plugins/Billing/classes/BillingPlugin.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "queries": [],
+  "tests": [
+    {
+      "symbol": "ExtraTests",
+      "type": "class",
+      "package": "unpackaged",
+      "file": "unpackaged/classes/ExtraTests.cls",
+      "line": 1,
+      "scope": "unpackagedMetadata",
+      "reasons": [
+        "direct"
+      ],
+      "seed": {
+        "symbol": "BillingPlugin",
+        "file": "plugins/Billing/classes/BillingPlugin.cls"
+      },
+      "path": [
+        {
+          "target": {
+            "symbol": "BillingPlugin.run(invoice)",
+            "file": "plugins/Billing/classes/BillingPlugin.cls"
+          },
+          "referrer": {
+            "symbol": "ExtraTests.billingRuns()",
+            "file": "unpackaged/classes/ExtraTests.cls"
+          },
+          "reference": 3,
+          "via": "member",
+          "evidence": [],
+          "ambiguous": false
+        }
+      ]
+    }
+  ],
+  "possible": [],
+  "references": {
+    "3": {
+      "tier": "parsed",
+      "kind": "call",
+      "referenced": "BillingPlugin.run(invoice)",
+      "referenced_type": "method",
+      "resolution": "declaration",
+      "referrer": "ExtraTests.billingRuns()",
+      "package": "unpackaged",
+      "file": "unpackaged/classes/ExtraTests.cls",
+      "line": 5,
+      "column": 42
+    },
+    "73": {
+      "tier": "parsed",
+      "kind": "construct",
+      "referenced": "BillingPlugin",
+      "referenced_type": "class",
+      "resolution": "declaration",
+      "referrer": "ExtraTests.billingRuns()",
+      "package": "unpackaged",
+      "file": "unpackaged/classes/ExtraTests.cls",
+      "line": 5,
+      "column": 26
+    },
+    "180": {
+      "tier": "parsed",
+      "kind": "grant",
+      "referenced": "BillingPlugin",
+      "referenced_type": "class",
+      "resolution": "declaration",
+      "referrer": "Admin",
+      "package": "plugins/Billing",
+      "file": "plugins/Billing/declarative/profiles/Admin.profile-meta.xml",
+      "line": 4,
+      "column": 20
+    },
+    "181": {
+      "tier": "parsed",
+      "kind": "grant",
+      "referenced": "BillingPlugin",
+      "referenced_type": "class",
+      "resolution": "declaration",
+      "referrer": "Billing",
+      "package": "force-app",
+      "file": "force-app/main/default/permissionsets/Billing.permissionset-meta.xml",
+      "line": 4,
+      "column": 20
+    },
+    "348": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "BillingPlugin",
+      "referrer": "Admin",
+      "package": "plugins/Billing",
+      "file": "plugins/Billing/declarative/profiles/Admin.profile-meta.xml",
+      "line": 4,
+      "column": 20
+    },
+    "349": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "BillingPlugin",
+      "referrer": "Billing",
+      "package": "force-app",
+      "file": "force-app/main/default/permissionsets/Billing.permissionset-meta.xml",
+      "line": 4,
+      "column": 20
+    },
+    "350": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "BillingPlugin",
+      "referrer": "BillingPlugin",
+      "package": "plugins/Billing",
+      "file": "plugins/Billing/classes/BillingPlugin.cls",
+      "line": 1,
+      "column": 27
+    },
+    "351": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "BillingPlugin",
+      "referrer": "ExtraTests.billingRuns()",
+      "package": "unpackaged",
+      "file": "unpackaged/classes/ExtraTests.cls",
+      "line": 5,
+      "column": 26
+    },
+    "636": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "firstSealArea",
+      "referrer": "BillingPlugin.firstSealArea()",
+      "package": "plugins/Billing",
+      "file": "plugins/Billing/classes/BillingPlugin.cls",
+      "line": 12,
+      "column": 18
+    },
+    "655": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "sealArea",
+      "referrer": "BillingPlugin.sealArea()",
+      "package": "plugins/Billing",
+      "file": "plugins/Billing/classes/BillingPlugin.cls",
+      "line": 6,
+      "column": 18
+    }
+  },
+  "untested": [],
+  "confidence": "partial",
+  "gaps": [
+    {
+      "file": "not-there",
+      "line": null,
+      "reason": "scope_error",
+      "source": "refs"
+    }
+  ],
+  "diagnostics": {
+    "ambiguous": 44,
+    "parse_error": 3,
+    "skipped_file": 1,
+    "unmodelled_file": 3,
+    "unreached_collision": 10,
+    "unresolved": 92,
+    "unsupported_element": 7
+  },
+  "unresolved": [],
+  "collisions": [
+    {
+      "declarations": [
+        {
+          "file": "force-app/declarative/profiles/Admin.profile-meta.xml",
+          "line": 1,
+          "package": "force-app",
+          "scope": "packageDirectories",
+          "symbol": "Admin",
+          "type": "profile"
+        },
+        {
+          "file": "plugins/Billing/declarative/profiles/Admin.profile-meta.xml",
+          "line": 1,
+          "package": "plugins/Billing",
+          "scope": "packageDirectories",
+          "symbol": "Admin",
+          "type": "profile"
+        }
+      ],
+      "symbol": "Admin"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,8 @@
+{
+  "name": "sf-impact-demo-render",
+  "private": true,
+  "description": "Pinned renderer for docs/demo/demo.svg",
+  "dependencies": {
+    "svg-term-cli": "2.1.1"
+  }
+}

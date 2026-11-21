@@ -1,0 +1,9 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"650885148c53677de595a82773ce164d3abcfec2","head":"79d0d61a1bf60380eeacede608946495b41bf9ea","head_tree":"cf10b38cc1ca268b46a1f97dbd44d4b1f4809eef","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"650885148c53677de595a82773ce164d3abcfec2","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"79d0d61a1bf60380eeacede608946495b41bf9ea","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"moved","base":{"file":"one/B.xml","id":"3d9db9e95004dd842776e67c3896121673e84b10","mode":"100644","binary":false},"head":{"file":"first/B.xml","id":"3d9db9e95004dd842776e67c3896121673e84b10","mode":"100644","binary":false},"new_directory":"first"}
+{"row":"file","status":"deleted","base":{"file":"one/D.xml","id":"3d9db9e95004dd842776e67c3896121673e84b10","mode":"100644","binary":false},"head":null}
+{"row":"file","status":"moved","base":{"file":"one/A.xml","id":"3d9db9e95004dd842776e67c3896121673e84b10","mode":"100644","binary":false},"head":{"file":"second/A.xml","id":"3d9db9e95004dd842776e67c3896121673e84b10","mode":"100644","binary":false},"new_directory":"second"}
+{"row":"file","status":"moved","base":{"file":"one/C.xml","id":"3d9db9e95004dd842776e67c3896121673e84b10","mode":"100644","binary":false},"head":{"file":"third/E.xml","id":"3d9db9e95004dd842776e67c3896121673e84b10","mode":"100644","binary":false},"new_directory":"third"}
+{"row":"blob","id":"3d9db9e95004dd842776e67c3896121673e84b10","text":"<ApexClass/>\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Do__c</fullName>
+    <label>Do</label>
+    <referenceTo>Shipping_Plugin__mdt</referenceTo>
+    <relationshipLabel>Done by</relationshipLabel>
+    <relationshipName>Done_By</relationshipName>
+    <type>MetadataRelationship</type>
+</CustomField>

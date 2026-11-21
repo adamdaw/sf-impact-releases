@@ -1,0 +1,511 @@
+{
+  "$id": "https://raw.githubusercontent.com/adamdaw/sf-impact-releases/main/schema/refs.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "refs.jsonl row",
+  "description": "One line of refs.jsonl, the output of `sf-impact-extract`. The file is JSON Lines: each line is one object that is valid against this schema. The first row is the `provenance` row, which says what wrote the file and of which tree. The rows after it are sorted: `scope_error` rows first, then the rows of each file in path order; within a file the `parse_error` row, the `skipped_file` row, the `unmodelled_file` row, then `declaration` rows by `start`, then `reference` rows by `line` and `column`, then `unsupported_element` rows by `line` and `column`, and rows at one place by their text. The same tree in the same state always gives a byte-identical file. Names compare case-insensitively, as in Apex, and are written with the case they have in the source. All integer fields require integer JSON tokens; floating tokens such as 1.0 or 1e0 are refused even when mathematically integral. Draft 2020-12 cannot express that lexical distinction; readers enforce it. Schema version 1 uses closed objects. In every row after provenance, an object with a duplicate key is refused. Provenance rows retain last-wins handling of duplicate keys. Readers refuse unknown schema versions; any added field, including an optional field, requires a schema version bump.",
+  "oneOf": [
+    { "$ref": "#/$defs/provenance" },
+    { "$ref": "#/$defs/scope_error" },
+    { "$ref": "#/$defs/parse_error" },
+    { "$ref": "#/$defs/skipped_file" },
+    { "$ref": "#/$defs/unmodelled_file" },
+    { "$ref": "#/$defs/declaration" },
+    { "$ref": "#/$defs/parsed_reference" },
+    { "$ref": "#/$defs/metadata_reference" },
+    { "$ref": "#/$defs/textual_reference" },
+    { "$ref": "#/$defs/unsupported_element" }
+  ],
+  "$defs": {
+    "provenance": {
+      "description": "What wrote the file, and of what: the first row of the file, and the only one of its kind. A refs.jsonl that is kept, in a cache or anywhere else, is used again only by a run that it is for, and this row is how the tool that reads it knows. `sf-impact-changed` and `sf-impact-tests` read it before any other row and refuse the file, in one line, unless it is of the head they were given: see `tree`, `root`, `scope` and `config`. They first hold the row itself to this schema, and refuse one that is not valid against it. The row holds no time, no name of a machine and no path of one, so the same tree in the same state still gives a byte-identical file.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "provenance" },
+        "tool": {
+          "description": "The tool that wrote the file: `sf-impact-extract`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "description": "The version of that tool, as its `--version` prints it. It says what wrote the file; what a tool reads is decided by `schema`.",
+          "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([-+][\\s\\S]*)?$"
+        },
+        "schema": {
+          "description": "The version of this schema that the file is valid against: 2. Version 1 was the first to have this row; version 2 has the same rows, and is the first whose refs flow between the stages as a refs pack (docs/pack.md), whose line 1 is this row. `sf-impact-extract --format jsonl` and `--dump` write the pack as this file. A tool refuses a file of a version it does not know. A file that does not start with this row is of the format before version 1 and is refused too.",
+          "type": "integer", "const": 2
+        },
+        "tree": { "$ref": "#/$defs/provenance_tree" },
+        "root": {
+          "description": "Where the project that was read is in its repository: see `provenance_root`. Null only for a tree that is `unknown`: where no commit could be read, the place may not be known either, and `sf-impact-extract` then gives none. The field is there all the same: null says that the place is not known, and a row that leaves the field out is refused. Refs are used only with a delta of the same root.",
+          "oneOf": [{ "$ref": "#/$defs/provenance_root" }, { "type": "null" }]
+        },
+        "scope": {
+          "description": "The scope that was read: what the sfdx-project.json at the root declares. Refs are used only with a delta whose head declares the same.",
+          "$ref": "#/$defs/provenance_scope"
+        },
+        "config": {
+          "description": "The config that the tree was read with. Refs are used only with a delta whose head has the same.",
+          "$ref": "#/$defs/provenance_config"
+        }
+      },
+      "required": ["row", "tool", "version", "schema", "tree", "root", "scope", "config"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "tree": { "properties": { "state": { "const": "unknown" } } } } },
+          "else": { "properties": { "root": { "type": "string" } } }
+        }
+      ]
+    },
+    "provenance_tree": {
+      "description": "The tree that was read, as far as it is known. Before it reads a file, `sf-impact-extract` asks git which commit is checked out where `--root` is and what that commit holds (`rev-parse`, `ls-tree`): plumbing that reads and writes nothing, run without any `GIT_*` variable of the caller's and without the user's and the system's configuration, as `sf-impact-delta` runs it. It asks git nothing after. What it reads is sfdx-project.json, sf-impact.json if there is one, and every file under the scope directories, each once, and of the bytes that it read of each it works out the id that git gives such content, itself. Those ids and the set of files are held to the commit. So the comparison is of the very bytes that the rows are made of, and a file that changes while the tool runs is the commit's only if what was read of it is. Nothing else counts: a file outside the scope is not read, whatever git says of it, and a file in scope that the commit does not have counts though git ignores it. A file's mode is not content. Refs are of the head of a delta if `commit` is its head or `tree` is the tree of its head, and `root` is its `root`.",
+      "oneOf": [
+        {
+          "description": "Every file that was read is as this commit has it, and the commit has no file in scope that was not read: the tree is a clean checkout of the commit, as far as it was read.",
+          "type": "object",
+          "properties": {
+            "state": { "const": "commit" },
+            "commit": {
+              "description": "The full id of the commit that is checked out.",
+              "$ref": "#/$defs/provenance_id"
+            },
+            "tree": {
+              "description": "The id of the tree of that commit. Another commit with the same tree has the same content: the commit rebased, amended or squashed without a change. Refs of this commit are refs of that one. One commit has one tree: refs that name the head of a delta and another tree than it has are refused.",
+              "$ref": "#/$defs/provenance_id"
+            }
+          },
+          "required": ["state", "commit", "tree"],
+          "additionalProperties": false
+        },
+        {
+          "description": "`dirty`: the root is in a repository with a commit checked out, and what was read is not what that commit has: a file in scope is changed, new, ignored or gone, or the commit has a directory in scope that is not on disk. `sf-impact-extract` says which file on standard error. `unknown`: no commit could be read: the root is in no repository, the repository has no commit, there is no git, or git refuses the repository because another user owns it (`--trust-repo` has it read). Neither can be verified to be of any commit. `sf-impact-changed` and `sf-impact-tests` refuse such refs with a delta, unless they are told to use them as they are (`--accept-unverified-refs`), and then say in their output that they did.",
+          "type": "object",
+          "properties": {
+            "state": { "enum": ["dirty", "unknown"] }
+          },
+          "required": ["state"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "provenance_id": {
+      "description": "The id of a git object, in full: 40 hexadecimal digits, or 64 in a repository that uses SHA-256.",
+      "type": "string",
+      "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "provenance_root": {
+      "description": "Where the project is in its repository: the path of the directory that holds sfdx-project.json, from the top of the repository, with `/` between its parts and without `.` segments or a trailing separator; `.` where the project is at the top. Never a path of the machine. One commit can hold several projects, each declaring the same directories: this is what tells the refs of one from the refs of another.",
+      "type": "string",
+      "pattern": "^(?:\\.|(?:[^/\\\\]*[^/\\\\.:]|[^/\\\\]*[^./\\\\]\\.+|\\.{3,})(?:/(?:[^/\\\\]*[^./\\\\][^/\\\\]*|\\.{3,}))*)$"
+    },
+    "provenance_scope": {
+      "description": "The scope directories that sfdx-project.json declares, as paths from the root with `/` separators and without `.` segments or a trailing separator, as every `package` is written. Each list is sorted by the bytes of the paths and has each path once. A declared path that leaves the root, absolute or with `..`, holds nothing in scope and is in neither list. A directory that both keys name is in `packageDirectories` alone. A declared directory that is not on disk is still declared, and is listed. An empty scope path denotes the project root.",
+      "type": "object",
+      "properties": {
+        "packageDirectories": {
+          "description": "The `path` of every entry of `packageDirectories`.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "unpackagedMetadata": {
+          "description": "The `unpackagedMetadata.path` of every entry of `packageDirectories` that has one.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["packageDirectories", "unpackagedMetadata"],
+      "additionalProperties": false
+    },
+    "provenance_config": {
+      "description": "A hash of the config as it takes effect, not of the file sf-impact.json as it is written: 16 hexadecimal digits in lower case, the FNV-1a hash of 64 bits of the UTF-8 text `{\"namespaces\":[..],\"textualAllowList\":[..],\"textualMinLength\":n}`, written without white space, each list with its names in ASCII lower case, sorted by their bytes, each once. So a tree with no config file, one with `{}` and one that states the defaults all hash as `4e7844462778448c`, and keys that are for other tools change nothing. It tells two configs apart. It is no protection against a file made to deceive, and neither is the rest of the row.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "scope_error": {
+      "description": "A directory named in sfdx-project.json that was not read. Whatever it holds is missing from the file. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "scope_error" },
+        "path": {
+          "description": "The path exactly as written in sfdx-project.json.",
+          "type": "string"
+        },
+        "declared_in": {
+          "description": "The key of sfdx-project.json that names the path.",
+          "enum": ["packageDirectories", "unpackagedMetadata"]
+        },
+        "reason": {
+          "description": "`missing`: nothing at that path. `not_a_directory`: the path, or a directory on the way to it, is a file or a symbolic link (links are not followed, wherever in the path they are). `outside_root`: an absolute path or one containing `..`; nothing outside the root is read.",
+          "enum": ["missing", "not_a_directory", "outside_root"]
+        }
+      },
+      "required": ["row", "path", "declared_in", "reason"],
+      "additionalProperties": false
+    },
+    "parse_error": {
+      "description": "A file that could not be parsed cleanly: an Apex file the grammar could not parse, a metadata file, a Flow among them, that is not well-formed XML, or an LWC JS/TS, CSS or template file that its scanner could not read. Syntax and recovery failures only. An element that is well-formed and is not read is an `unsupported_element` row, not this; a file that has both has both rows. One row per such file. The file still yields `textual` references, and the declarations and `parsed` references that were recovered, which may be incomplete: from Apex what the grammar recovered, from metadata what stands before the error or what the scanner recovered. A metadata file is still declared, because its path names it. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "parse_error" },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "line": {
+          "description": "The line of the first error.",
+          "type": "integer",
+          "minimum": 1, "maximum": 4294967295
+        }
+      },
+      "required": ["row", "package", "file", "line"],
+      "additionalProperties": false
+    },
+    "skipped_file": {
+      "description": "A file in scope that the textual tier could not search, so references inside it, if there are any, are not in this output. One row per such file. A file is text if and only if it is valid UTF-8, or UTF-16 (LE or BE) with a BOM that decodes without error, and the decoded content contains no NUL (U+0000). An Apex file that is skipped is still parsed. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "skipped_file" },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "reason": {
+          "description": "`binary`: the file could not be searched because it is not text. A file is text if and only if it is valid UTF-8, or UTF-16 (LE or BE) with a BOM that decodes without error, and the decoded content contains no NUL (U+0000). An optional UTF-8 BOM is preserved; a UTF-16 BOM is removed. Reported as a skipped_file row and a gap, never as zero matches.",
+          "enum": ["binary"]
+        }
+      },
+      "required": ["row", "package", "file", "reason"],
+      "additionalProperties": false
+    },
+    "declaration": {
+      "description": "Something declared in scope that a reference can resolve to. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "declaration" },
+        "symbol": {
+          "description": "The API name. From metadata: an object, custom permission, permission set or profile is its name (`Invoice__c`); a field or validation rule is qualified by its object (`Invoice__c.Total__c`); a custom metadata record by its type without `__mdt` (`Plugin.Billing`); a label is written as Apex names it (`Label.Greeting`); a message channel adds its module suffix (`MessageChannel.Changed__c`, from `Changed.messageChannel-meta.xml`). The name is read from the file's path, as source format has it, except a label's, which is in the labels file. From Apex: a top-level type or trigger is its name (`Invoice`); a nested type and a field or enum value are qualified by the enclosing type (`MathUtil.Mode`, `MathUtil.Mode.UP`); a method or constructor adds its canonical parameter types, so that overloads are distinct. Identity is (`package`, `type`, `symbol`) and is not guaranteed unique: see `collision`. Callable symbols preserve owner and member source spelling; parameter types are canonical: lowercase throughout, with System. removed from primitive and collection names, Iterable, Iterator, Object and SObject, and arrays written recursively as list<...>, without spaces. For example, Account.process(System.List<Id>) and Account.process(Id[]) both become Account.process(list<id>).",
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "description": "The last segment of `symbol`, without parameters: `round`. This is the name the textual tier looks for.",
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "description": "What kind of thing is declared. A property is a `field`. The second line of values is declared by metadata files: `object` is any object that has an object file (custom, custom metadata type, custom setting, or a standard object the repository customises), `object_field` a field file, `metadata_record` a custom metadata record, and `message_channel` a Lightning message channel.",
+          "oneOf": [
+            {
+              "enum": [
+                "class", "interface", "enum", "trigger", "method", "constructor", "field", "enum_value",
+                "object", "object_field", "validation_rule", "label", "custom_permission", "message_channel", "permission_set", "profile", "metadata_record"
+              ]
+            },
+            { "$ref": "#/$defs/flow_lwc_declaration_type" }
+          ]
+        },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "start": {
+          "description": "First line of the declaration, annotations and modifiers included. Lines count from 1. A metadata file is one declaration from its first line to its last, except the labels file, where each label is its `<labels>` element.",
+          "type": "integer",
+          "minimum": 1, "maximum": 4294967295
+        },
+        "end": {
+          "description": "Last line of the declaration, inclusive.",
+          "type": "integer",
+          "minimum": 1, "maximum": 4294967295
+        },
+        "scope": {
+          "description": "The project key that declared this row's package directory. The nearest scope directory wins; if the same directory is named under both keys, packageDirectories wins.",
+          "enum": ["packageDirectories", "unpackagedMetadata"]
+        },
+        "is_test": {
+          "description": "The declaration itself carries `@IsTest` or the `testMethod` modifier. Not inherited from an enclosing class.",
+          "type": "boolean"
+        },
+        "annotations": {
+          "description": "Names of the annotations on the declaration, as written and in source order, without arguments: `AuraEnabled`, `InvocableMethod`, `RestResource`. They mark declarations that are reached from outside Apex.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "collision": {
+          "description": "Another declaration in scope has the same name, ignoring case, and is the same kind of thing: the same class in two package directories, for example, or a profile that two package directories each hold a part of. Classes, interfaces and enums share one namespace. Every such declaration has its own row and none is chosen silently. A reference to the name has the one `referenced` symbol they share. If the declarations of a type are the same in substance (supertypes, method and constructor signatures and return types, field types) they resolve as one. If they differ, the type is divergent, and so is every type that inherits from it: a reference that is resolved through a divergent type is not narrowed. It names every member reachable from every declaration, without one hiding another, and says `ambiguous_receiver` where that is more than one.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "row",
+        "symbol",
+        "name",
+        "type",
+        "package",
+        "file",
+        "start",
+        "end",
+        "is_test",
+        "annotations",
+        "scope",
+        "collision"
+      ],
+      "additionalProperties": false
+    },
+    "parsed_reference": {
+      "description": "A reference read from syntax. A reference is a row unless it is proven to be the Apex platform's alone: a platform name (`String`, `System.debug`), or a member of a value whose static type is proven to be a platform type. The proof is narrow: a platform class without type arguments returns platform types, and a collection returns its elements from the methods that are modelled. A platform type with type arguments, a collection method that is not modelled, or a call that produced no row proves nothing, and what follows is reported with `unknown_type`. A platform name in front of a name does not make it the platform's: `Schema.Invoice__c`, `Label.Greeting` and `Flow.Interview.Welcome` are rows. Collections and primitives written with their namespace (`System.List<Foo>`) are the same types as without. Not finding a declaration is never a reason to leave a reference out. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "reference" },
+        "tier": { "const": "parsed" },
+        "kind": {
+          "description": "`call`: a method call. `construct`: `new T(..)`, `this(..)` or `super(..)`. `type`: a type named in a declaration (a field, variable, parameter or return type, a type argument), in `instanceof`, as `T.class`, an object named in the describe form `SObjectType.Invoice__c`, or an object that metadata declares, named through a member of it (`Invoice__c.SObjectType`, `Settings__c.getInstance()`). `cast`: the type of a cast. `extends`, `implements`: a supertype. `static_access`: a member reached through a type name (`Type.member`), a static field or enum value used without its type inside the type that declares it or in a `switch` label, an object's field token (`Invoice__c.Total__c`, also written `Schema.Invoice__c.Total__c` or `SObjectType.Invoice__c.fields.Total__c`), or a custom label (`Label.Greeting`). `soql_object`, `soql_field`: an object or field named in an embedded SOQL or SOSL query; a field is prefixed with the object it is selected from and may be a relationship path (`Account.Owner.Name`, `Account.Contacts`). Where metadata declares the fields of a path, the path is one row for each field along it, all at the place of the path: `Carrier__r.Region__c` selected from `Shipment__c` is `Shipment__c.Carrier__c` and `Carrier__c.Region__c`, and a child relationship (`Parcels__r`) is the lookup field that makes it. `dml_object`: the object type of the operand of a DML statement or of `Database.insert(..)` and its siblings. `dml_field`: the external ID field of an `upsert`. `sobject_field`: a field set in a record initialiser, `new Account(Name = ..)`. `trigger_object`: the object a trigger is on.",
+          "oneOf": [{ "enum": [
+            "call",
+            "construct",
+            "type",
+            "cast",
+            "extends",
+            "implements",
+            "static_access",
+            "soql_object",
+            "soql_field",
+            "dml_object",
+            "dml_field",
+            "sobject_field",
+            "trigger_object"
+          ] }, { "$ref": "#/$defs/flow_lwc_reference_kind" }]
+        },
+        "referenced": {
+          "description": "What is referred to. With `resolution` `declaration` this is the `symbol` of a declaration row of the kind `referenced_type` says, except with `detail` `ambiguous_overload`, where it is the method without parameters (`MathUtil.clamp`), and `ambiguous_receiver`, where it is the name as written (a bare member or type name). Where a name is declared more than once and the declarations differ in case, it is the spelling that sorts first. Otherwise it is the name as written at the reference, without a `Schema.` or `System.` qualifier in front of an object or a label.",
+          "type": "string",
+          "minLength": 1
+        },
+        "referenced_type": {
+          "description": "What kind of thing `referenced` is. With `resolution` `declaration`, the `type` of the declaration it is, or of every candidate; `class` stands for any Apex type. Otherwise the kind of thing the syntax names, where it names one: a call names a `method`; a type name a `class`, as Apex has one namespace for types, which an SObject that no file declares shares; a query names an `object` and its fields `object_field`s; a Flow or a Lightning web component names each thing as what it is. Required with `resolution` `declaration`, except where candidates are of different kinds. Absent where the kind is not known, as for a static access through a name that nothing declares: the name may then be of any kind.",
+          "enum": [
+            "class", "method", "constructor", "field", "enum_value", "trigger", "object", "object_field", "validation_rule",
+            "label", "custom_permission", "message_channel", "permission_set", "profile", "metadata_record", "flow", "lwc",
+            "tab", "global_value_set"
+          ]
+        },
+        "resolution": {
+          "description": "`declaration`: `referenced` is declared in scope, by Apex or, for an object, a field of one or a label, by metadata. `external`: it is in a namespace listed in the config file (`ns.Type`, `ns__Object__c`), or is a member of a type in one; expected, not a gap. `unresolved`: neither, and not proven to be the platform's; a gap in what this file can say. A standard object or field that no metadata file in the repository declares (`Account`, `Invoice__c.Name`) is `unresolved`, and so is a member of a type that is not declared in scope (`Account.get`, `Missing.run`).",
+          "enum": ["declaration", "external", "unresolved"]
+        },
+        "detail": {
+          "description": "Present when the reference could not be pinned to exactly one declaration, and says why. `ambiguous_overload`: several overloads fit the call and the argument types do not decide; `candidates` lists them. `ambiguous_receiver`: the reference is reached through a name that is declared more than once with declarations that differ, or through an earlier reference that was itself ambiguous, or, for a field, through a lookup that is declared more than once to different objects, so it is one of several declarations; `candidates` lists every one it may be. This over-reports by design: nothing is hidden or preferred among them. It applies to calls, constructions, static accesses and type names alike. `unknown_type`: the type of the receiver of a call, of the operand of DML, or of the value a `switch` is on could not be established from the source; `referenced` is then the bare member name, or `SObject`. Reported whether or not anything declared has that name. `no_member`: the type is declared in scope but it and its supertypes declare no such member, or a bare name is declared nowhere in reach.",
+          "enum": ["ambiguous_overload", "ambiguous_receiver", "unknown_type", "no_member"]
+        },
+        "candidates": {
+          "description": "With `ambiguous_overload` or `ambiguous_receiver`: the symbols of the declarations the reference may be to, sorted, each once. Present with those two details and with no other.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 2,
+          "uniqueItems": true
+        },
+        "referrer": { "$ref": "#/$defs/referrer" },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "line": { "$ref": "#/$defs/line" },
+        "column": { "$ref": "#/$defs/column" }
+      },
+      "required": ["row", "tier", "kind", "referenced", "resolution", "referrer", "package", "file", "line", "column"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "detail": { "enum": ["ambiguous_overload", "ambiguous_receiver"] }
+            },
+            "required": ["detail"]
+          },
+          "then": { "required": ["candidates"] },
+          "else": {
+            "not": { "required": ["candidates"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "resolution": { "const": "declaration" } },
+            "not": { "required": ["candidates"] }
+          },
+          "then": { "required": ["referenced_type"] }
+        }
+      ]
+    },
+    "unmodelled_file": {
+      "description": "A metadata file in scope whose type the parsed tier does not model: a layout, a tab, a list view. One row per such file. The textual tier still searches it, but what it refers to by structure is not in this output, and what it declares is not a declaration. A metadata file is one named `<name>.<suffix>-meta.xml`; the companion files of Apex classes and triggers hold nothing to model and have no row. A field or validation rule file that is not in an object's directory, a custom metadata record file without its type in its name, and a file whose name leaves the component's name empty, cannot be named and are reported here. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "unmodelled_file" },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "suffix": {
+          "description": "What stands between the component's name and `-meta.xml` in the file name: `layout`, `listView`, `compactLayout`.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["row", "package", "file", "suffix"],
+      "additionalProperties": false
+    },
+    "metadata_reference": {
+      "description": "A reference read from the structure of a metadata file: an object, field or validation rule, a permission set or profile, or a custom metadata record. Told apart from a reference read from Apex by its `kind`. As there, not finding a declaration is never a reason to leave a reference out, and neither is the thing being the platform's: a granted `standard-` tab is a row. The one exception is a constant of `$Api` or `$System` in a formula, which names nothing. An element of such a file that is not read for references has an `unsupported_element` row unless it is known to hold no name; a reference is never to an empty name. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "reference" },
+        "tier": { "const": "parsed" },
+        "kind": {
+          "description": "`lookup`: the object a lookup or master-detail field points at; for a metadata relationship field, `EntityDefinition`, `FieldDefinition` or a custom metadata type. `lookup_filter`: a field that a lookup filter compares: a field of the object looked up, written with it (`Carrier__c.Region__c`), a field of the object the lookup is on (`$Source.Weight__c`), or a field of a global, as in a formula. `controlling_field`: the field that controls this one: the controlling field of a dependent picklist, or the field of a custom metadata type that says which object a metadata relationship to a field is about. `display_field`: the field a validation rule shows its error on. `value_set`: the global value set a picklist takes its values from. `formula`: a name in a formula field, in a field's default value, or in the condition of a validation rule: a field, or what a global names (`$Label.Greeting`, `$Permission.Can_Approve`, `$Setup.Settings__c.Limit__c`, `$CustomMetadata.Plugin__mdt.Billing.Handler__c`, `$User.Region__c`, `$ObjectType.Invoice__c.Fields.Total__c`). A relationship path (`Account__r.Region__c`) is one row for each field along it, all at the start of the path: the lookup, then the field it reaches. Names in strings and comments are not references. `summary`: a field that a roll-up summary sums, filters on or joins on. `grant`: something a permission set or profile grants access to: a class, an object, a field, a Flow, a tab (a `standard-` tab too), a custom permission, a custom metadata type or a custom setting. `cmdt_field`: a field of its type that a custom metadata record sets, whatever it sets it to. `cmdt`: something a custom metadata record names in a value or in its own name. A value of a metadata relationship field names what the field's declared type says: an object (`EntityDefinition`), a field of the object that the controlling field's value names (`FieldDefinition`; as written and `unresolved` if the record does not say which object), or a record of another type; such a row is there whether or not anything declares the name. Any other value, and the record's own name, is a row only if it equals a declared symbol, ignoring case: a class, a Flow, an object and so on; a class bound by a framework and a value that matches by coincidence look the same here, so the row says which field it came from. `cmdt_type`: the custom metadata type a record is a record of.",
+          "enum": [
+            "lookup", "lookup_filter", "formula", "summary", "controlling_field", "display_field", "value_set",
+            "grant", "cmdt", "cmdt_field", "cmdt_type"
+          ]
+        },
+        "referenced": {
+          "description": "What is referred to. With `resolution` `declaration` this is the `symbol` of a declaration row of the kind `referenced_type` says, except with `detail` `ambiguous_receiver`, where it is the field name as written. Otherwise it is the name as written; where a relationship path cannot be followed, the rest of the path as written, after the last object that was reached (`Account.Owner.Manager.Name`).",
+          "type": "string",
+          "minLength": 1
+        },
+        "referenced_type": {
+          "description": "What kind of thing `referenced` is, as the source says: the `type` of the declaration it resolves to or would resolve to. `class` stands for any Apex type. `lwc` is a Lightning web component bundle, which a custom metadata value can equal the name of. `tab` and `global_value_set` are kinds of thing that metadata names and this tool does not yet declare. Absent only on a `formula` row, for a global that is not known (`$Action.Account.New`).",
+          "enum": [
+            "class", "method", "constructor", "field", "enum_value", "trigger", "object", "object_field", "validation_rule",
+            "label", "custom_permission", "message_channel", "permission_set", "profile", "metadata_record", "flow", "lwc",
+            "tab", "global_value_set"
+          ]
+        },
+        "resolution": {
+          "description": "`declaration`: declared in scope. `external`: in a namespace listed in the config file (`ns__Object__c`, `ns__Class`); expected, not a gap. `unresolved`: neither: a standard object or field that no file in the repository declares, a Flow that is not in scope, a tab or a global value set, or a name that is wrong; a gap in what this file can say.",
+          "enum": ["declaration", "external", "unresolved"]
+        },
+        "detail": {
+          "description": "`ambiguous_receiver`: the field is reached through a lookup that is declared more than once, to different objects, so it is one of several declarations; `candidates` lists every one it may be. Nothing is chosen among them.",
+          "enum": ["ambiguous_receiver"]
+        },
+        "candidates": {
+          "description": "With `ambiguous_receiver`: the symbols of the declared fields the reference may be to, sorted, each once. An object the path may also lead to that does not declare the field is not among them: it has an `unresolved` row of its own at the same place.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 2,
+          "uniqueItems": true
+        },
+        "referrer": {
+          "description": "The `symbol` of the component the file declares.",
+          "type": "string",
+          "minLength": 1
+        },
+        "source_field": {
+          "description": "On a `cmdt` row, and on no other: the field of the record whose value names `referenced`, or `DeveloperName` where it is the record's own name.",
+          "type": "string",
+          "minLength": 1
+        },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "line": {
+          "description": "Line of the name in the file, counting from 1. A reference that comes from the file's name (`cmdt_type`, and `cmdt` from `DeveloperName`) is at line 1, column 1.",
+          "type": "integer",
+          "minimum": 1, "maximum": 4294967295
+        },
+        "column": { "$ref": "#/$defs/column" }
+      },
+      "required": ["row", "tier", "kind", "referenced", "resolution", "referrer", "package", "file", "line", "column"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "required": ["detail"] },
+          "then": { "required": ["candidates"] },
+          "else": {
+            "not": { "required": ["candidates"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "cmdt" } }
+          },
+          "then": { "required": ["source_field"] },
+          "else": {
+            "not": { "required": ["source_field"] }
+          }
+        },
+        {
+          "if": {
+            "properties": { "kind": { "const": "formula" } }
+          },
+          "else": { "required": ["referenced_type"] }
+        }
+      ]
+    },
+    "unsupported_element": {
+      "description": "An element of a metadata file that is well-formed and was not read, so that what it refers to, if anything, is not in this output. One row for each such element, at the element. This is the one diagnostic for unsupported structure in any metadata file, Flows included; a syntax error is a `parse_error`, and a whole file of a type that is not modelled is an `unmodelled_file`. In an object, field, validation rule, permission set, profile, custom metadata record, labels or custom permission file every element is one of three things: read for the name in it, known to hold no name (a flag, a number, a label, free text, a literal value, a permission or user licence that only the platform defines), or reported here; the default is to report, so an element that this tool has never heard of is a row. In a Flow, a structure that the Flow reader does not know and that holds a value it could not interpret is reported; references and merge tokens inside it are read all the same. An empty reference-bearing Flow element is reported with reason `no_name`. The textual tier still searches the file. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "unsupported_element" },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "element": {
+          "description": "The element's path below the root element, with `/` between names: `layoutAssignments`, `actionOverrides/content`, in a Flow `recordLookups/futureFilter`. The path stops at the element that is reported.",
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "description": "`not_interpreted`: the tool does not read this element and does not know it to hold no name, or it reads the element and cannot make a name of the kind it should hold out of what is there (a lookup filter value `$Source` with no field): it may refer to something. `no_name`: the element is one that is read, and it should name something, but it is empty, or the element in it that holds the name is missing or empty; no reference is made to an empty name.",
+          "enum": ["not_interpreted", "no_name"]
+        },
+        "line": { "$ref": "#/$defs/line" },
+        "column": { "$ref": "#/$defs/column" }
+      },
+      "required": ["row", "package", "file", "element", "reason", "line", "column"],
+      "additionalProperties": false
+    },
+    "textual_reference": {
+      "description": "A whole-word, case-insensitive occurrence of a declared `name` in a file in scope, comments and string literals included: what a grep for the name would find. Independent of the parsed tier, so a reference found by both has a row in each. Names shorter than the configured minimum length (6 by default) are not looked for unless the config file's allow-list names them. A file is text if and only if it is valid UTF-8, or UTF-16 (LE or BE) with a BOM that decodes without error, and the decoded content contains no NUL (U+0000). A file that cannot be searched has a `skipped_file` row instead. An object with a duplicate key is refused.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "reference" },
+        "tier": { "const": "textual" },
+        "kind": { "const": "text" },
+        "referenced": {
+          "description": "The word as written in the file. It equals the `name` of at least one declaration, ignoring case; it may be an occurrence of any of them or of none.",
+          "type": "string",
+          "minLength": 1
+        },
+        "referrer": { "$ref": "#/$defs/referrer" },
+        "package": { "$ref": "#/$defs/package" },
+        "file": { "$ref": "#/$defs/file" },
+        "line": { "$ref": "#/$defs/line" },
+        "column": { "$ref": "#/$defs/column" }
+      },
+      "required": ["row", "tier", "kind", "referenced", "referrer", "package", "file", "line", "column"],
+      "additionalProperties": false
+    },
+    "flow_lwc_declaration_type": {
+      "description": "flow: the file stem of a .flow-meta.xml, regardless of version/status, including malformed files. lwc: a bundle directory name, once per directory. The main JS is its declaration file, else main HTML, else js-meta.xml, else the first file. Every bundle file uses that name as referrer. These types have separate namespaces from Apex; duplicate declarations are all retained and marked collision.",
+      "enum": ["flow", "lwc"]
+    },
+    "flow_lwc_reference_kind": {
+      "description": "Flow object/field names, Apex action classes (or unresolved names for unmodelled action types), subflows, screen components, labels, custom permissions and custom metadata records; LWC Apex methods, schema names, labels, custom permissions, message channels, components, targets and objects. Apex imports retain every overload (ambiguous_overload), or all inherited candidates through divergent types (ambiguous_receiver). Object, field, label, custom permission, custom metadata type/record and message channel references resolve through the declarative catalog, with the same relationship traversal and collision rules as Apex. Labels use Label.X (namespace: Label.ns.X), channels MessageChannel.X__c. Resolved permissions use their declaration symbol X; undeclared permissions retain CustomPermission.X. Targets retain their literal lightning__ spelling as unresolved because no target declaration is modelled. Untyped dotted references yield unknown_type. Reference leaves and merge tokens are read in every Flow subtree; an unknown structure with an uninterpreted leaf is an `unsupported_element` row. Resolved custom metadata records use their declaration symbol Type.Record; undeclared records retain Type__mdt.Record. Their fields use Type__mdt.Field. Namespaced components use ns:camelName.",
+      "enum": ["flow_object", "flow_field", "flow_action", "flow_subflow", "flow_component", "flow_label", "flow_custom_permission", "flow_custom_metadata", "lwc_apex", "lwc_schema", "lwc_label", "lwc_custom_permission", "lwc_message_channel", "lwc_component", "lwc_target", "lwc_object"]
+    },
+    "package": {
+      "description": "The scope directory the file is under: a `packageDirectories` path or an `unpackagedMetadata` path from sfdx-project.json, relative to the root, with `/` separators whatever the project file uses.",
+      "type": "string"
+    },
+    "file": {
+      "description": "Path of the file relative to the root, with `/` separators.",
+      "type": "string",
+      "minLength": 1
+    },
+    "referrer": {
+      "description": "The `symbol` of the innermost declaration that contains the reference: a method, constructor or field, else the type or trigger; in a metadata file, the component the file declares, or the label. Flow and LWC references use the Flow or bundle name, including auxiliary bundle files. Null where no declaration contains the reference.",
+      "type": ["string", "null"]
+    },
+    "line": {
+      "description": "Line of the reference, counting from 1. For a call or a static access, the line of the member name.",
+      "type": "integer",
+      "minimum": 1, "maximum": 4294967295
+    },
+    "column": {
+      "description": "Byte offset of the reference within its line, counting from 1. For a UTF-16 file, the offset in its UTF-8 transcoding.",
+      "type": "integer",
+      "minimum": 1, "maximum": 4294967295
+    }
+  }
+}

@@ -1,0 +1,4 @@
+<Flow>
+    <description>FlowInvoiceAction</description>
+    <start><object>Invoice__c</start>
+</Flow>

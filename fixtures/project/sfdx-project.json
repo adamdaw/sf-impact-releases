@@ -1,0 +1,13 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "unpackagedMetadata": { "path": "unpackaged" }
+    },
+    { "path": "plugins\\Billing" },
+    { "path": "not-there" }
+  ],
+  "namespace": "",
+  "sourceApiVersion": "62.0"
+}

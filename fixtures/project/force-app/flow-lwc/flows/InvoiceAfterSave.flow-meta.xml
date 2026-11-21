@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <start><object>Invoice__c</object><recordTriggerType>CreateAndUpdate</recordTriggerType><filters><field>Paid__c</field><operator>EqualTo</operator><value><booleanValue>true</booleanValue></value></filters></start>
+    <actionCalls><actionName>FlowInvoiceAction</actionName><actionType>apex</actionType><inputParameters><name>ids</name><value><elementReference>$Record.Id</elementReference></value></inputParameters></actionCalls>
+    <recordLookups><name>InvoiceLookup</name><object>Invoice__c</object><filters><field>Total__c</field></filters><queriedFields>Id</queriedFields><outputAssignments><field>OwnerId</field><assignToReference>owner</assignToReference></outputAssignments></recordLookups>
+    <subflows><flowName>InvoiceChild</flowName></subflows>
+    <status>Draft</status>
+</Flow>

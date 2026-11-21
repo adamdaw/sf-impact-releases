@@ -1,0 +1,130 @@
+{
+  "$id": "https://raw.githubusercontent.com/adamdaw/sf-impact-releases/main/schema/refs-pack.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "refs pack content",
+  "description": "The logical content of a refs pack, schema 2: line 1, the rows, and an optional manifest. `docs/pack.md` specifies the bytes; this schema writes the content as one JSON object so that it can be stated and checked, and a pack is never stored this way. The rows are exactly the rows of refs.jsonl after its line 1, in its order, each valid against refs.schema.json; `sf-impact-extract --dump` writes line 1 and the rows as refs.jsonl, byte for byte as schema 1 has them apart from `\"schema\":2` on line 1. The manifest is not part of refs.jsonl: `--dump` leaves it out, and nothing that a stage writes depends on it. A pack is a function of this content alone.",
+  "type": "object",
+  "properties": {
+    "provenance": {
+      "description": "Line 1: the provenance row of refs.schema.json, with `schema` 2. Every other field is as refs.schema.json has it.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "provenance" },
+        "tool": { "const": "sf-impact-extract" },
+        "schema": { "type": "integer", "const": 2 }
+      },
+      "required": ["row", "tool", "schema"]
+    },
+    "rows": {
+      "description": "Every row after line 1, in refs.jsonl order, each valid against refs.schema.json.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "row": { "enum": ["scope_error", "parse_error", "skipped_file", "unmodelled_file", "declaration", "reference", "unsupported_element"] }
+        },
+        "required": ["row"]
+      }
+    },
+    "manifest": { "$ref": "#/$defs/manifest" }
+  },
+  "required": ["provenance", "rows"],
+  "additionalProperties": false,
+  "$defs": {
+    "manifest": {
+      "description": "What a writer that reuses its last pack needs that is not a row. A pack has no manifest or exactly one. Readers decode it as strictly as the rows and refuse a malformed one, but never interpret it.",
+      "type": "object",
+      "properties": {
+        "files": {
+          "description": "Every file in scope, whether or not it has rows, in path order (by bytes, strictly increasing). Every file that has rows is here, with the same package.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/file_entry" }
+        },
+        "types": {
+          "description": "Every class, interface and enum that extract's phase one declared, as resolving references needs them: by `file`, never decreasing, and within a file in the order that the file declares them, which resolving depends on.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/type" }
+        },
+        "relationships": {
+          "description": "Lookup and master-detail fields, as following a relationship needs them, strictly increasing by (`file`, `field`, `to`, `child_name`, `controlling`), absent before present.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationship" }
+        }
+      },
+      "required": ["files", "types", "relationships"],
+      "additionalProperties": false
+    },
+    "file_entry": {
+      "type": "object",
+      "properties": {
+        "package": { "type": "string" },
+        "path": { "type": "string", "minLength": 1 },
+        "blob": {
+          "description": "The git blob id of the bytes that were read: 20 bytes in a SHA-1 repository, 32 in a SHA-256 one, the same for every entry.",
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0, "maximum": 255 },
+          "oneOf": [
+            { "minItems": 20, "maxItems": 20 },
+            { "minItems": 32, "maxItems": 32 }
+          ]
+        }
+      },
+      "required": ["package", "path", "blob"],
+      "additionalProperties": false
+    },
+    "file_index": {
+      "description": "The index of a file in `files`.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "type": {
+      "type": "object",
+      "properties": {
+        "file": { "$ref": "#/$defs/file_index" },
+        "symbol": { "description": "The type's symbol, as its declaration row has it.", "type": "string", "minLength": 1 },
+        "superclass": { "description": "As written; null if it extends nothing.", "type": ["string", "null"] },
+        "interfaces": { "description": "As written, in the order written.", "type": "array", "items": { "type": "string" } },
+        "methods": { "description": "In source order.", "type": "array", "items": { "$ref": "#/$defs/callable" } },
+        "constructors": { "description": "In source order.", "type": "array", "items": { "$ref": "#/$defs/callable" } },
+        "fields": { "description": "Fields and enum values, in source order.", "type": "array", "items": { "$ref": "#/$defs/field" } }
+      },
+      "required": ["file", "symbol", "superclass", "interfaces", "methods", "constructors", "fields"],
+      "additionalProperties": false
+    },
+    "callable": {
+      "type": "object",
+      "properties": {
+        "symbol": { "description": "As its declaration row has it.", "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "params": { "description": "Parameter types, as written, in order.", "type": "array", "items": { "type": "string" } },
+        "returns": { "description": "The return type as written; null for `void` and for a constructor.", "type": ["string", "null"] }
+      },
+      "required": ["symbol", "name", "params", "returns"],
+      "additionalProperties": false
+    },
+    "field": {
+      "type": "object",
+      "properties": {
+        "symbol": { "description": "As its declaration row has it.", "type": "string", "minLength": 1 },
+        "key": { "description": "The name, case-folded: what an access is matched on.", "type": "string", "minLength": 1 },
+        "ty": { "description": "The type as written; for an enum value, its enum.", "type": "string" },
+        "is_static": { "type": "boolean" },
+        "is_enum_value": { "type": "boolean" }
+      },
+      "required": ["symbol", "key", "ty", "is_static", "is_enum_value"],
+      "additionalProperties": false
+    },
+    "relationship": {
+      "type": "object",
+      "properties": {
+        "file": { "$ref": "#/$defs/file_index" },
+        "field": { "description": "The field's symbol: `Parcel__c.Shipment__c`.", "type": "string", "minLength": 1 },
+        "to": { "description": "The object it points at.", "type": "string", "minLength": 1 },
+        "child_name": { "description": "What the relationship is called from that object: `Parcels__r`.", "type": ["string", "null"] },
+        "controlling": { "description": "For a metadata relationship to a field: the field of the same type that says which object it is a field of.", "type": ["string", "null"] }
+      },
+      "required": ["file", "field", "to", "child_name", "controlling"],
+      "additionalProperties": false
+    }
+  }
+}

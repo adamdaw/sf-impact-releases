@@ -1,0 +1,279 @@
+{
+  "provenance": {
+    "tool": "sf-impact-tests",
+    "version": "0.1.0",
+    "schema": 1,
+    "inputs": {
+      "refs": {
+        "tool": "sf-impact-extract",
+        "version": "0.1.0",
+        "schema": 2,
+        "tree": {
+          "state": "commit",
+          "commit": "e930548656b27508697e5d2cf2a79e75c43106fc",
+          "tree": "cca55327df4cce03a9f2b1d0a35e6daad9d71a61"
+        },
+        "root": ".",
+        "scope": {
+          "packageDirectories": [
+            "force-app",
+            "not-there",
+            "plugins/Billing"
+          ],
+          "unpackagedMetadata": [
+            "unpackaged"
+          ]
+        },
+        "config": "af618349b7fc383d"
+      },
+      "changed": {
+        "tool": "sf-impact-changed",
+        "version": "0.1.0",
+        "schema": 1,
+        "base": "e16b3f485ad0db99a1b01008cfaa4fda07afc0af",
+        "head": "e930548656b27508697e5d2cf2a79e75c43106fc",
+        "head_tree": "cca55327df4cce03a9f2b1d0a35e6daad9d71a61",
+        "root": ".",
+        "scope": {
+          "packageDirectories": [
+            "force-app",
+            "not-there",
+            "plugins/Billing"
+          ],
+          "unpackagedMetadata": [
+            "unpackaged"
+          ]
+        },
+        "config": "af618349b7fc383d",
+        "confidence": "full",
+        "inputs": {
+          "refs": {
+            "tool": "sf-impact-extract",
+            "version": "0.1.0",
+            "schema": 2,
+            "tree": {
+              "state": "commit",
+              "commit": "e930548656b27508697e5d2cf2a79e75c43106fc",
+              "tree": "cca55327df4cce03a9f2b1d0a35e6daad9d71a61"
+            },
+            "root": ".",
+            "scope": {
+              "packageDirectories": [
+                "force-app",
+                "not-there",
+                "plugins/Billing"
+              ],
+              "unpackagedMetadata": [
+                "unpackaged"
+              ]
+            },
+            "config": "af618349b7fc383d"
+          },
+          "delta": {
+            "tool": "sf-impact-delta",
+            "version": "0.1.0",
+            "schema": 1,
+            "base": "e16b3f485ad0db99a1b01008cfaa4fda07afc0af",
+            "head": "e930548656b27508697e5d2cf2a79e75c43106fc",
+            "head_tree": "cca55327df4cce03a9f2b1d0a35e6daad9d71a61",
+            "root": ".",
+            "scope": {
+              "packageDirectories": [
+                "force-app",
+                "not-there",
+                "plugins/Billing"
+              ],
+              "unpackagedMetadata": [
+                "unpackaged"
+              ]
+            },
+            "config": "af618349b7fc383d"
+          }
+        }
+      }
+    }
+  },
+  "depth": 2,
+  "seeds": [
+    {
+      "symbol": "ShapeService.totalArea(list<shape>)",
+      "type": "method",
+      "package": "force-app",
+      "file": "force-app/main/default/classes/ShapeService.cls",
+      "line": 15,
+      "scope": "packageDirectories",
+      "sources": [
+        {
+          "change": "modified",
+          "collision": false,
+          "end": 21,
+          "file": "force-app/main/default/classes/ShapeService.cls",
+          "hunks": [
+            {
+              "base_lines": 1,
+              "base_start": 16,
+              "head_lines": 1,
+              "head_start": 16
+            }
+          ],
+          "package": "force-app",
+          "reason": "hunk",
+          "row": "symbol",
+          "start": 15,
+          "symbol": "ShapeService.totalArea(list<shape>)",
+          "type": "method"
+        }
+      ],
+      "counts": {
+        "parsed": 1,
+        "textual": 2
+      },
+      "referrers": [
+        {
+          "type": "method",
+          "parsed": [
+            {
+              "referrer": {
+                "symbol": "ShapeServiceTest.totalsAreas()",
+                "file": "force-app/main/default/classes/ShapeServiceTest.cls"
+              },
+              "references": [
+                28
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "ShapeService.totalArea(list<shape>)",
+                    "file": "force-app/main/default/classes/ShapeService.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "ShapeService.totalArea(list<shape>)",
+                "file": "force-app/main/default/classes/ShapeService.cls"
+              },
+              "references": [
+                675
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "ShapeService.totalArea(list<shape>)",
+                    "file": "force-app/main/default/classes/ShapeService.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            },
+            {
+              "referrer": {
+                "symbol": "ShapeServiceTest.totalsAreas()",
+                "file": "force-app/main/default/classes/ShapeServiceTest.cls"
+              },
+              "references": [
+                676
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "ShapeService.totalArea(list<shape>)",
+                    "file": "force-app/main/default/classes/ShapeService.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "queries": [],
+  "tests": [
+    {
+      "symbol": "ShapeServiceTest",
+      "type": "class",
+      "package": "force-app",
+      "file": "force-app/main/default/classes/ShapeServiceTest.cls",
+      "line": 1,
+      "scope": "packageDirectories",
+      "reasons": [
+        "convention",
+        "direct"
+      ],
+      "seed": {
+        "symbol": "ShapeService.totalArea(list<shape>)",
+        "file": "force-app/main/default/classes/ShapeService.cls"
+      },
+      "path": []
+    }
+  ],
+  "possible": [],
+  "references": {
+    "28": {
+      "tier": "parsed",
+      "kind": "call",
+      "referenced": "ShapeService.totalArea(list<shape>)",
+      "referenced_type": "method",
+      "resolution": "declaration",
+      "referrer": "ShapeServiceTest.totalsAreas()",
+      "package": "force-app",
+      "file": "force-app/main/default/classes/ShapeServiceTest.cls",
+      "line": 6,
+      "column": 40
+    },
+    "675": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "totalArea",
+      "referrer": "ShapeService.totalArea(list<shape>)",
+      "package": "force-app",
+      "file": "force-app/main/default/classes/ShapeService.cls",
+      "line": 15,
+      "column": 25
+    },
+    "676": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "totalArea",
+      "referrer": "ShapeServiceTest.totalsAreas()",
+      "package": "force-app",
+      "file": "force-app/main/default/classes/ShapeServiceTest.cls",
+      "line": 6,
+      "column": 40
+    }
+  },
+  "untested": [],
+  "confidence": "partial",
+  "gaps": [
+    {
+      "file": "not-there",
+      "line": null,
+      "reason": "scope_error",
+      "source": "refs"
+    }
+  ],
+  "diagnostics": {
+    "ambiguous": 44,
+    "parse_error": 3,
+    "skipped_file": 1,
+    "unmodelled_file": 3,
+    "unreached_collision": 11,
+    "unresolved": 92,
+    "unsupported_element": 7
+  },
+  "unresolved": [],
+  "collisions": [],
+  "errors": []
+}

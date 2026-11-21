@@ -1,0 +1,8 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"c8698713e947a902d718b7073f3bd1ab366e30a1","head":"63ba2931b019b7e2622db4ed9cc61d6837878aa2","head_tree":"4d60ff943d694aa38e01e4b2f3f5ef057952d363","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"c8698713e947a902d718b7073f3bd1ab366e30a1","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"63ba2931b019b7e2622db4ed9cc61d6837878aa2","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"added","base":null,"head":{"file":"app/billing/Alpha.cls","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","mode":"100644","binary":false},"new_directory":"app/billing"}
+{"row":"file","status":"deleted","base":{"file":"app/classes/Alpha.cls","id":"5e40eefd89100a50904c0fc706c23b51631c6482","mode":"100644","binary":false},"head":null}
+{"row":"blob","id":"5e40eefd89100a50904c0fc706c23b51631c6482","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 2;\n    }\n}\n"}
+{"row":"blob","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 20;\n    }\n}\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

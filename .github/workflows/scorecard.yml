@@ -1,0 +1,54 @@
+# OpenSSF Scorecard — supply-chain security health metrics for this repository.
+#
+# Runs weekly and on pushes to main. Publishes results to the Security tab
+# (via SARIF) and to the OpenSSF Scorecard API (https://scorecard.dev).
+#
+# Reference: https://securityscorecards.dev
+# Reference: https://github.com/ossf/scorecard-action
+# Reference: https://github.com/ossf/scorecard
+
+name: OpenSSF Scorecard
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly Sunday 04:00 UTC — offset from CodeQL (Monday 06:00) to spread load.
+    - cron: '0 4 * * 0'
+
+# Least-privilege: no default permissions; each job grants only what it needs.
+permissions: {}
+
+jobs:
+  scorecard:
+    name: Scorecard analysis
+    # Scorecard publishing and SARIF upload need the public repository.
+    if: github.repository == 'adamdaw/sf-impact-releases'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      # Required by ossf/scorecard-action to read repo contents and metadata.
+      contents: read
+      # Required to upload SARIF results to the Security tab.
+      security-events: write
+      # Required for the Scorecard API to publish results (OIDC token).
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Run OpenSSF Scorecard
+        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          # Publish results to the OpenSSF Scorecard API (visible at scorecard.dev).
+          publish_results: true
+
+      - name: Upload Scorecard results to Security tab
+        uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
+        with:
+          sarif_file: results.sarif

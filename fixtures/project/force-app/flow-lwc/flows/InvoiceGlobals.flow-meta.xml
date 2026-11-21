@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <textTemplates><name>InvoiceMessage</name><text>{!$Label.Invoice_Title}</text></textTemplates>
+    <formulas><name>CanApprove</name><dataType>Boolean</dataType><expression>{!$Permission.Approve_Invoice}</expression></formulas>
+    <formulas><name>ApprovalLimit</name><dataType>Number</dataType><expression>{!$CustomMetadata.Invoice_Tier__mdt.Gold.Limit__c}</expression></formulas>
+    <formulas><name>FetchedTotal</name><dataType>Number</dataType><expression>{!Fetch.record.Total__c}</expression></formulas>
+    <futureInvoiceSettings><mode>Deferred</mode></futureInvoiceSettings>
+    <status>Draft</status>
+</Flow>

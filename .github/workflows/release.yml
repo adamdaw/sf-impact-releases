@@ -1,0 +1,184 @@
+name: release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  # PRs build the two Linux targets; release tags build all four targets.
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - '.github/workflows/ci.yml'
+      - 'Cargo.lock'
+      - 'Cargo.toml'
+      - 'crates/*/Cargo.toml'
+      - 'scripts/*release*'
+      - 'scripts/*license*'
+      - 'scripts/check-static.sh'
+      - 'about.*'
+      - 'licenses/**'
+      - 'THIRD_PARTY_LICENSES'
+      - 'LICENSE'
+      - 'docs/release-README.md'
+      - 'install.sh'
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('release-pr-{0}', github.event.pull_request.number) || format('release-run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_VERSION: '1.100.0'
+
+jobs:
+  tag:
+    permissions:
+      contents: read
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact version tag and ancestry on main
+        env:
+          TAG: ${{ github.ref_name }}
+        run: python3 scripts/check-release-tag.py "$TAG"
+
+  check:
+    name: Release CI gate
+    permissions:
+      contents: read
+    needs: tag
+    # Re-run every CI gate on this exact tagged commit before publishing.
+    uses: ./.github/workflows/ci.yml
+
+  licenses:
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Toolchain and pinned license generator
+        run: |
+          rustup toolchain install "$RUST_VERSION" --profile minimal
+          rustup default "$RUST_VERSION"
+          scripts/install-cargo-about.sh "$RUNNER_TEMP/tools"
+          echo "$RUNNER_TEMP/tools" >> "$GITHUB_PATH"
+      - name: Generate and verify notices; prove the rejection gate
+        run: |
+          scripts/licenses.sh
+          git diff --exit-code -- THIRD_PARTY_LICENSES
+          python3 scripts/test-license-gate.py
+          python3 scripts/test-license-notices.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: third-party-notices
+          path: THIRD_PARTY_LICENSES
+          if-no-files-found: error
+
+  build:
+    permissions:
+      contents: read
+    needs: licenses
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(github.event_name == 'pull_request' &&
+          '[{"runner":"ubuntu-24.04","target":"x86_64-unknown-linux-musl"},{"runner":"ubuntu-24.04-arm","target":"aarch64-unknown-linux-musl"}]' ||
+          '[{"runner":"ubuntu-24.04","target":"x86_64-unknown-linux-musl"},{"runner":"ubuntu-24.04-arm","target":"aarch64-unknown-linux-musl"},{"runner":"macos-15-intel","target":"x86_64-apple-darwin"},{"runner":"macos-15","target":"aarch64-apple-darwin"}]') }}
+    runs-on: ${{ matrix.runner }}
+    env:
+      TARGET: ${{ matrix.target }}
+      MACOSX_DEPLOYMENT_TARGET: '13.0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: third-party-notices
+      - name: Native toolchain
+        run: |
+          rustup toolchain install "$RUST_VERSION" --profile minimal --target "$TARGET"
+          rustup default "$RUST_VERSION"
+          if [[ "$TARGET" == *-linux-musl ]]; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends musl-tools
+            echo 'CC=musl-gcc' >> "$GITHUB_ENV"
+          fi
+      - name: Build all five commands from the lockfile
+        run: |
+          export SOURCE_DATE_EPOCH
+          SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          export RUSTFLAGS="--remap-path-prefix=$PWD=/sf-impact --remap-path-prefix=${CARGO_HOME:-$HOME/.cargo}=/cargo"
+          export CFLAGS="-ffile-prefix-map=$PWD=/sf-impact -ffile-prefix-map=${CARGO_HOME:-$HOME/.cargo}=/cargo"
+          if [[ "$TARGET" == *-linux-musl ]]; then
+            export RUSTFLAGS="$RUSTFLAGS -C linker=musl-gcc"
+          fi
+          cargo build --release --workspace --bins --locked --target "$TARGET"
+      - name: Verify binaries
+        run: |
+          if [[ "$TARGET" == *-linux-musl ]]; then
+            scripts/check-static.sh "target/$TARGET/release"
+          else
+            for binary in sf-impact-extract sf-impact-delta sf-impact-changed sf-impact-tests sf-impact-render; do
+              "target/$TARGET/release/$binary" --version
+              otool -L "target/$TARGET/release/$binary"
+              # A standalone executable may use macOS system libraries only.
+              otool -L "target/$TARGET/release/$binary" | tail -n +2 |
+                awk '$1 !~ /^\/(usr\/lib|System\/Library)\// { bad = 1 } END { exit bad }'
+            done
+          fi
+      - name: Package and checksum
+        run: python3 scripts/package-release.py "$TARGET" "target/$TARGET/release" dist
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-${{ matrix.target }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'adamdaw/sf-impact-releases'
+    needs: [tag, check, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist
+      - name: Verify assets
+        run: |
+          cd dist
+          test "$(find . -name '*.tar.gz' | wc -l)" -eq 4
+          test "$(find . -name '*.sha256' | wc -l)" -eq 4
+          cat ./*.sha256 > SHA256SUMS
+          sha256sum --check SHA256SUMS
+      - name: Attest release archives and checksums
+        uses: actions/attest-build-provenance@00014ed6ed5efc5b1ab7f7f34a39eb55d41aa4f8 # v3.1.0
+        with:
+          subject-path: |
+            dist/*.tar.gz
+            dist/SHA256SUMS
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          cd dist
+          gh release create "$TAG" --verify-tag --title "sf-impact $TAG" \
+            --generate-notes ./*.tar.gz ./*.sha256 SHA256SUMS

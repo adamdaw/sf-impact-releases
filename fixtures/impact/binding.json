@@ -1,0 +1,620 @@
+{
+  "provenance": {
+    "tool": "sf-impact-tests",
+    "version": "0.1.0",
+    "schema": 1,
+    "inputs": {
+      "refs": {
+        "tool": "sf-impact-extract",
+        "version": "0.1.0",
+        "schema": 2,
+        "tree": {
+          "state": "commit",
+          "commit": "7beaeee714bb0eb5db353c70f6c66a37012bea59",
+          "tree": "102c04e66b696a31ea326a8fe89fabd87c9d66fb"
+        },
+        "root": ".",
+        "scope": {
+          "packageDirectories": [
+            "force-app"
+          ],
+          "unpackagedMetadata": []
+        },
+        "config": "4e7844462778448c"
+      },
+      "changed": {
+        "tool": "sf-impact-changed",
+        "version": "0.1.0",
+        "schema": 1,
+        "base": "cb3a3f4229e2ef5da6162a37d47ab1ddeaf2c220",
+        "head": "7beaeee714bb0eb5db353c70f6c66a37012bea59",
+        "head_tree": "102c04e66b696a31ea326a8fe89fabd87c9d66fb",
+        "root": ".",
+        "scope": {
+          "packageDirectories": [
+            "force-app"
+          ],
+          "unpackagedMetadata": []
+        },
+        "config": "4e7844462778448c",
+        "confidence": "full",
+        "inputs": {
+          "refs": {
+            "tool": "sf-impact-extract",
+            "version": "0.1.0",
+            "schema": 2,
+            "tree": {
+              "state": "commit",
+              "commit": "7beaeee714bb0eb5db353c70f6c66a37012bea59",
+              "tree": "102c04e66b696a31ea326a8fe89fabd87c9d66fb"
+            },
+            "root": ".",
+            "scope": {
+              "packageDirectories": [
+                "force-app"
+              ],
+              "unpackagedMetadata": []
+            },
+            "config": "4e7844462778448c"
+          },
+          "delta": {
+            "tool": "sf-impact-delta",
+            "version": "0.1.0",
+            "schema": 1,
+            "base": "cb3a3f4229e2ef5da6162a37d47ab1ddeaf2c220",
+            "head": "7beaeee714bb0eb5db353c70f6c66a37012bea59",
+            "head_tree": "102c04e66b696a31ea326a8fe89fabd87c9d66fb",
+            "root": ".",
+            "scope": {
+              "packageDirectories": [
+                "force-app"
+              ],
+              "unpackagedMetadata": []
+            },
+            "config": "4e7844462778448c"
+          }
+        }
+      }
+    }
+  },
+  "depth": 2,
+  "seeds": [
+    {
+      "symbol": "ShipmentAudit",
+      "type": "class",
+      "package": "force-app",
+      "file": "force-app/declarative/classes/ShipmentAudit.cls",
+      "line": 1,
+      "scope": "packageDirectories",
+      "sources": [
+        {
+          "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+          "kind": "cmdt",
+          "line": 19,
+          "package": "force-app",
+          "referenced": "ShipmentAudit",
+          "referenced_type": "class",
+          "referrer": "Shipping_Plugin.Tracking",
+          "resolution": "declaration",
+          "row": "touched",
+          "side": "head"
+        }
+      ],
+      "counts": {
+        "parsed": 1,
+        "textual": 2
+      },
+      "referrers": [
+        {
+          "type": "class",
+          "parsed": [],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "ShipmentAudit",
+                "file": "force-app/declarative/classes/ShipmentAudit.cls"
+              },
+              "references": [
+                8
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "ShipmentAudit",
+                    "file": "force-app/declarative/classes/ShipmentAudit.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        },
+        {
+          "type": "metadata_record",
+          "parsed": [
+            {
+              "referrer": {
+                "symbol": "Shipping_Plugin.Tracking",
+                "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml"
+              },
+              "references": [
+                0
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "ShipmentAudit",
+                    "file": "force-app/declarative/classes/ShipmentAudit.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "Shipping_Plugin.Tracking",
+                "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml"
+              },
+              "references": [
+                9
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "ShipmentAudit",
+                    "file": "force-app/declarative/classes/ShipmentAudit.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "ShipmentTracker",
+      "type": "class",
+      "package": "force-app",
+      "file": "force-app/declarative/classes/ShipmentTracker.cls",
+      "line": 1,
+      "scope": "packageDirectories",
+      "sources": [
+        {
+          "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+          "kind": "cmdt",
+          "line": 19,
+          "package": "force-app",
+          "referenced": "ShipmentTracker",
+          "referenced_type": "class",
+          "referrer": "Shipping_Plugin.Tracking",
+          "resolution": "declaration",
+          "row": "touched",
+          "side": "base"
+        }
+      ],
+      "counts": {
+        "parsed": 0,
+        "textual": 1
+      },
+      "referrers": [
+        {
+          "type": "class",
+          "parsed": [],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "ShipmentTracker",
+                "file": "force-app/declarative/classes/ShipmentTracker.cls"
+              },
+              "references": [
+                10
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "ShipmentTracker",
+                    "file": "force-app/declarative/classes/ShipmentTracker.cls"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "Shipping_Plugin.Tracking",
+      "type": "metadata_record",
+      "package": "force-app",
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 1,
+      "scope": "packageDirectories",
+      "sources": [
+        {
+          "change": "modified",
+          "collision": false,
+          "end": 21,
+          "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+          "hunks": [
+            {
+              "base_lines": 1,
+              "base_start": 19,
+              "head_lines": 1,
+              "head_start": 19
+            }
+          ],
+          "package": "force-app",
+          "reason": "hunk",
+          "row": "symbol",
+          "start": 1,
+          "symbol": "Shipping_Plugin.Tracking",
+          "type": "metadata_record"
+        }
+      ],
+      "counts": {
+        "parsed": 0,
+        "textual": 1
+      },
+      "referrers": [
+        {
+          "type": "metadata_record",
+          "parsed": [],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "Shipping_Plugin.Tracking",
+                "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml"
+              },
+              "references": [
+                11
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "Shipping_Plugin.Tracking",
+                    "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "symbol": "Shipping_Plugin__mdt",
+      "type": "object",
+      "package": "force-app",
+      "file": "force-app/declarative/objects/Shipping_Plugin__mdt/Shipping_Plugin__mdt.object-meta.xml",
+      "line": 1,
+      "scope": "packageDirectories",
+      "sources": [
+        {
+          "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+          "kind": "cmdt_type",
+          "line": 1,
+          "package": "force-app",
+          "referenced": "Shipping_Plugin__mdt",
+          "referenced_type": "object",
+          "referrer": "Shipping_Plugin.Tracking",
+          "resolution": "declaration",
+          "row": "touched",
+          "side": "base"
+        },
+        {
+          "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+          "kind": "cmdt_type",
+          "line": 1,
+          "package": "force-app",
+          "referenced": "Shipping_Plugin__mdt",
+          "referenced_type": "object",
+          "referrer": "Shipping_Plugin.Tracking",
+          "resolution": "declaration",
+          "row": "touched",
+          "side": "head"
+        }
+      ],
+      "counts": {
+        "parsed": 1,
+        "textual": 0
+      },
+      "referrers": [
+        {
+          "type": "metadata_record",
+          "parsed": [
+            {
+              "referrer": {
+                "symbol": "Shipping_Plugin.Tracking",
+                "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml"
+              },
+              "references": [
+                5
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "Shipping_Plugin__mdt",
+                    "file": "force-app/declarative/objects/Shipping_Plugin__mdt/Shipping_Plugin__mdt.object-meta.xml"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ],
+          "textual": []
+        }
+      ]
+    },
+    {
+      "symbol": "Shipping_Plugin__mdt.Handler__c",
+      "type": "object_field",
+      "package": "force-app",
+      "file": "force-app/declarative/objects/Shipping_Plugin__mdt/fields/Handler__c.field-meta.xml",
+      "line": 1,
+      "scope": "packageDirectories",
+      "sources": [
+        {
+          "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+          "kind": "cmdt_field",
+          "line": 18,
+          "package": "force-app",
+          "referenced": "Shipping_Plugin__mdt.Handler__c",
+          "referenced_type": "object_field",
+          "referrer": "Shipping_Plugin.Tracking",
+          "resolution": "declaration",
+          "row": "touched",
+          "side": "base"
+        },
+        {
+          "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+          "kind": "cmdt_field",
+          "line": 18,
+          "package": "force-app",
+          "referenced": "Shipping_Plugin__mdt.Handler__c",
+          "referenced_type": "object_field",
+          "referrer": "Shipping_Plugin.Tracking",
+          "resolution": "declaration",
+          "row": "touched",
+          "side": "head"
+        }
+      ],
+      "counts": {
+        "parsed": 1,
+        "textual": 2
+      },
+      "referrers": [
+        {
+          "type": "metadata_record",
+          "parsed": [
+            {
+              "referrer": {
+                "symbol": "Shipping_Plugin.Tracking",
+                "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml"
+              },
+              "references": [
+                4
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "Shipping_Plugin__mdt.Handler__c",
+                    "file": "force-app/declarative/objects/Shipping_Plugin__mdt/fields/Handler__c.field-meta.xml"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "Shipping_Plugin.Tracking",
+                "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml"
+              },
+              "references": [
+                6
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "Shipping_Plugin__mdt.Handler__c",
+                    "file": "force-app/declarative/objects/Shipping_Plugin__mdt/fields/Handler__c.field-meta.xml"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        },
+        {
+          "type": "object_field",
+          "parsed": [],
+          "textual": [
+            {
+              "referrer": {
+                "symbol": "Shipping_Plugin__mdt.Handler__c",
+                "file": "force-app/declarative/objects/Shipping_Plugin__mdt/fields/Handler__c.field-meta.xml"
+              },
+              "references": [
+                7
+              ],
+              "routes": [
+                {
+                  "target": {
+                    "symbol": "Shipping_Plugin__mdt.Handler__c",
+                    "file": "force-app/declarative/objects/Shipping_Plugin__mdt/fields/Handler__c.field-meta.xml"
+                  },
+                  "via": "reference",
+                  "evidence": []
+                }
+              ],
+              "ambiguous": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "queries": [],
+  "tests": [],
+  "possible": [],
+  "references": {
+    "0": {
+      "tier": "parsed",
+      "kind": "cmdt",
+      "referenced": "ShipmentAudit",
+      "referenced_type": "class",
+      "resolution": "declaration",
+      "referrer": "Shipping_Plugin.Tracking",
+      "source_field": "Handler__c",
+      "package": "force-app",
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 19,
+      "column": 38
+    },
+    "4": {
+      "tier": "parsed",
+      "kind": "cmdt_field",
+      "referenced": "Shipping_Plugin__mdt.Handler__c",
+      "referenced_type": "object_field",
+      "resolution": "declaration",
+      "referrer": "Shipping_Plugin.Tracking",
+      "package": "force-app",
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 18,
+      "column": 16
+    },
+    "5": {
+      "tier": "parsed",
+      "kind": "cmdt_type",
+      "referenced": "Shipping_Plugin__mdt",
+      "referenced_type": "object",
+      "resolution": "declaration",
+      "referrer": "Shipping_Plugin.Tracking",
+      "package": "force-app",
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 1,
+      "column": 1
+    },
+    "6": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "Handler__c",
+      "referrer": "Shipping_Plugin.Tracking",
+      "package": "force-app",
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 18,
+      "column": 16
+    },
+    "7": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "Handler__c",
+      "referrer": "Shipping_Plugin__mdt.Handler__c",
+      "package": "force-app",
+      "file": "force-app/declarative/objects/Shipping_Plugin__mdt/fields/Handler__c.field-meta.xml",
+      "line": 3,
+      "column": 15
+    },
+    "8": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "ShipmentAudit",
+      "referrer": "ShipmentAudit",
+      "package": "force-app",
+      "file": "force-app/declarative/classes/ShipmentAudit.cls",
+      "line": 1,
+      "column": 27
+    },
+    "9": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "ShipmentAudit",
+      "referrer": "Shipping_Plugin.Tracking",
+      "package": "force-app",
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 19,
+      "column": 38
+    },
+    "10": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "ShipmentTracker",
+      "referrer": "ShipmentTracker",
+      "package": "force-app",
+      "file": "force-app/declarative/classes/ShipmentTracker.cls",
+      "line": 1,
+      "column": 27
+    },
+    "11": {
+      "tier": "textual",
+      "kind": "text",
+      "referenced": "Tracking",
+      "referrer": "Shipping_Plugin.Tracking",
+      "package": "force-app",
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 3,
+      "column": 12
+    }
+  },
+  "untested": [
+    {
+      "symbol": "ShipmentAudit",
+      "type": "class",
+      "package": "force-app",
+      "file": "force-app/declarative/classes/ShipmentAudit.cls",
+      "line": 1,
+      "scope": "packageDirectories"
+    },
+    {
+      "symbol": "ShipmentTracker",
+      "type": "class",
+      "package": "force-app",
+      "file": "force-app/declarative/classes/ShipmentTracker.cls",
+      "line": 1,
+      "scope": "packageDirectories"
+    }
+  ],
+  "confidence": "partial",
+  "gaps": [
+    {
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 18,
+      "reason": "dynamic_binding",
+      "source": "refs"
+    },
+    {
+      "file": "force-app/declarative/customMetadata/Shipping_Plugin.Tracking.md-meta.xml",
+      "line": 19,
+      "reason": "dynamic_binding",
+      "source": "refs"
+    }
+  ],
+  "diagnostics": {
+    "unresolved": 3
+  },
+  "unresolved": [],
+  "collisions": [],
+  "errors": []
+}

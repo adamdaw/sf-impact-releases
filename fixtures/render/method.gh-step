@@ -1,0 +1,6 @@
+tests=ShapeServiceTest
+confidence=partial
+selected_count=1
+possible_count=0
+untested_count=0
+selection=selected

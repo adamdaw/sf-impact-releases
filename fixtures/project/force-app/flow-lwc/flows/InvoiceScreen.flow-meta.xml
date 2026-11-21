@@ -1,0 +1,1 @@
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata"><screens><name>ShowInvoice</name><fields><extensionName>c:invoicePanel</extensionName><fieldType>ComponentInstance</fieldType></fields></screens></Flow>

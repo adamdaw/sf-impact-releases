@@ -1,0 +1,36 @@
+{
+  "NebulaLogger": {
+    "commit": "b792ac8d8b4eb31b14a164a24951c3cb4125a616",
+    "queries": {
+      "SlackLoggerPlugin.sendAsyncSlackNotifications()": {"SlackLoggerPlugin.sendAsyncSlackNotifications()": ["sendAsyncSlackNotifications"]},
+      "LoggerPlugin__mdt": {"LoggerPlugin__mdt": ["LoggerPlugin__mdt"]},
+      "Logger_Recipes_Flow_Screen_Demos": {"Logger_Recipes_Flow_Screen_Demos": ["Logger_Recipes_Flow_Screen_Demos"]}
+    }
+  },
+  "apex-rollup": {
+    "commit": "5f16190f7ff4337db8b7acdd1769cbc23b88cc15",
+    "queries": {
+      "RollupCustomObjectLogger": {
+        "RollupCustomObjectLogger": ["MAX_LENGTH", "RollupCustomObjectLogger", "getLoggingLevelDeveloperName", "innerLog", "rollupLogEvents"],
+        "RollupCustomObjectLogger.RollupCustomObjectLogger()": ["RollupCustomObjectLogger"],
+        "RollupPlugin.RollupCustomObjectLogger": ["RollupCustomObjectLogger"]
+      },
+      "RollupOrderBy__mdt.Rollup__c": {"RollupOrderBy__mdt.Rollup__c": ["Rollup__c"]},
+      "rollupJobPoller": {"rollupJobPoller": ["rollupJobPoller"]}
+    }
+  },
+  "apex-recipes": {
+    "commit": "eda6167c5126a34daf66d9e1371ff6957ae223bd",
+    "queries": {
+      "StubExample.setGreeting": {
+        "StubExample.setGreeting(Integer)": ["setGreeting"],
+        "StubExample.setGreeting(String)": ["setGreeting"]
+      },
+      "FilesRecipes.createFileAttachedToRecord": {
+        "FilesRecipes.createFileAttachedToRecord(Blob,Id,String)": ["createFileAttachedToRecord"],
+        "FilesRecipes.createFileAttachedToRecord(FilesRecipes.FileAndLinkObject)": ["createFileAttachedToRecord"]
+      },
+      "CustomMetadataUtilties": {"CustomMetadataUtilties": ["CustomMetadataUtilties", "getBucketedPicklistsForObject", "getPicklistBucketWithValues"]}
+    }
+  }
+}

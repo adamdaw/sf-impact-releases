@@ -1,0 +1,9 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"c8698713e947a902d718b7073f3bd1ab366e30a1","head":"5137f1ff26cb601bab1220b9fa98f838f52b134f","head_tree":"ea301b41a780a9d9005fb37b519a1e5881edda51","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"250e9e40c15e0ea9"}
+{"row":"commit","side":"base","id":"c8698713e947a902d718b7073f3bd1ab366e30a1","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"5137f1ff26cb601bab1220b9fa98f838f52b134f","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":"ce4d4c2062a90d843bbf1d082feaaa1dea5235cd"}
+{"row":"file","status":"modified","base":{"file":"app/classes/Alpha.cls","id":"5e40eefd89100a50904c0fc706c23b51631c6482","mode":"100644","binary":false},"head":{"file":"app/classes/Alpha.cls","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","mode":"100644","binary":false},"hunks":[{"base_start":7,"base_lines":1,"head_start":7,"head_lines":1}]}
+{"row":"file","status":"added","base":null,"head":{"file":"sf-impact.json","id":"ce4d4c2062a90d843bbf1d082feaaa1dea5235cd","mode":"100644","binary":false}}
+{"row":"blob","id":"5e40eefd89100a50904c0fc706c23b51631c6482","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 2;\n    }\n}\n"}
+{"row":"blob","id":"ce4d4c2062a90d843bbf1d082feaaa1dea5235cd","text":"{\"namespaces\": [\"npsp\"]}\n"}
+{"row":"blob","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 20;\n    }\n}\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

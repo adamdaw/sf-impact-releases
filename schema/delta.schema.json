@@ -1,0 +1,238 @@
+{
+  "$id": "https://raw.githubusercontent.com/adamdaw/sf-impact-releases/main/schema/delta.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "delta.jsonl row",
+  "description": "One line of delta.jsonl, the output of `sf-impact-delta`. The file is JSON Lines: each line is one object that is valid against this schema. It says what is not the same in two commits, the base and the head, of the git repository that holds a Salesforce DX project: the two commits, every file that differs, the lines of it that differ, and the text of both versions. It says nothing of what a file declares; `sf-impact-changed` maps it onto symbols, and reads no repository to do so. Rows are in a fixed order: the `provenance` row, which says what wrote the file and of which commits, the `commit` row of the base, the `commit` row of the head, the `file` rows by the path of the file at head, or at base for a deleted file, in the order of their bytes, and the `blob` rows by `id`. The output is a function of the objects of the two commits and of nothing else: `sf-impact-delta` asks git which commit a name is, where two commits part, what a tree holds and what a blob is (`rev-parse`, `merge-base`, `ls-tree`, `cat-file`), and compares lines itself. `git diff` is not run, so the configuration of git, attributes, diff drivers and the environment have no say, and git is run without any `GIT_*` variable of the caller's, without the user's and the system's configuration, and without replacement objects or grafts. Nothing is fetched: an object that the repository does not have is an error and no row. No renames are detected: see `file`. All integer fields require integer JSON tokens; floating tokens such as 1.0 or 1e0 are refused even when mathematically integral. Draft 2020-12 cannot express that lexical distinction; readers enforce it. Schema version 1 uses closed objects. Readers refuse unknown schema versions; any added field, including an optional field, requires a schema version bump.",
+  "oneOf": [
+    { "$ref": "#/$defs/provenance" },
+    { "$ref": "#/$defs/commit" },
+    { "$ref": "#/$defs/delta_file" },
+    { "$ref": "#/$defs/blob" }
+  ],
+  "$defs": {
+    "delta_status": { "description": "Tree-entry comparison before changed-file classification.", "enum": ["added", "deleted", "modified", "moved"] },
+    "provenance": {
+      "description": "What wrote the file, and of what: the first row of the file, and the only one of its kind. `sf-impact-changed` reads this row and the first row of refs.jsonl before any other, and maps nothing unless the refs are of the head: of the commit `head` or of a commit with the tree `head_tree`, of the same project of the repository (`root`), with the same `scope` and the same `config`. It first holds each of the two rows to its schema, and refuses one that is not valid against it. The row holds no time, no name of a machine and no path of one, so the same two commits still give a byte-identical file wherever they are compared.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "provenance" },
+        "tool": {
+          "description": "The tool that wrote the file: `sf-impact-delta`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "description": "The version of that tool, as its `--version` prints it. It says what wrote the file; what a tool reads is decided by `schema`.",
+          "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([-+][\\s\\S]*)?$"
+        },
+        "schema": {
+          "description": "The version of this schema that the file is valid against: 1, the first to have this row. A tool refuses a file of a version it does not know. A file that does not start with this row is of the format before version 1 and is refused too.",
+          "type": "integer", "const": 1
+        },
+        "base": {
+          "description": "The full id of the commit compared from: the `id` of the `commit` row of the base.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "head": {
+          "description": "The full id of the commit compared to: the `id` of the `commit` row of the head. Refs that go with this delta are of this commit.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "head_tree": {
+          "description": "The id of the tree of the head (`rev-parse`). Refs of another commit with this tree are refs of the head too: the content is the same.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "root": {
+          "description": "Where the project is in the repository: the directory given as `--root`, from the top of the repository. Refs that go with this delta are of the same root.",
+          "$ref": "#/$defs/provenance_root"
+        },
+        "scope": {
+          "description": "What the sfdx-project.json of the head declares. Null if the head has no such file at the root of the project, or one that is not text or does not parse: `sf-impact-delta` compares the commits all the same, and `sf-impact-changed` refuses the delta. The field is there all the same, as `config` is: a row that leaves either out is refused as not valid.",
+          "oneOf": [{ "$ref": "#/$defs/provenance_scope" }, { "type": "null" }]
+        },
+        "config": {
+          "description": "The config of the head: of its sf-impact.json, or of the defaults if it has none. Null if the head has such a file and it is not text or does not parse.",
+          "oneOf": [{ "$ref": "#/$defs/provenance_config" }, { "type": "null" }]
+        }
+      },
+      "required": ["row", "tool", "version", "schema", "base", "head", "head_tree", "root", "scope", "config"],
+      "additionalProperties": false
+    },
+    "provenance_root": {
+      "description": "Where the project is in its repository: the path of the directory that holds sfdx-project.json, from the top of the repository, with `/` between its parts and without `.` segments or a trailing separator; `.` where the project is at the top. Never a path of the machine. One commit can hold several projects, each declaring the same directories: this is what tells the refs of one from the refs of another.",
+      "type": "string",
+      "pattern": "^(?:\\.|(?:[^/\\\\]*[^/\\\\.:]|[^/\\\\]*[^./\\\\]\\.+|\\.{3,})(?:/(?:[^/\\\\]*[^./\\\\][^/\\\\]*|\\.{3,}))*)$"
+    },
+    "provenance_scope": {
+      "description": "The scope directories that sfdx-project.json declares, as paths from the root with `/` separators and without `.` segments or a trailing separator, as every `package` is written. Each list is sorted by the bytes of the paths and has each path once. A declared path that leaves the root, absolute or with `..`, holds nothing in scope and is in neither list. A directory that both keys name is in `packageDirectories` alone. A declared directory that is not on disk is still declared, and is listed. An empty scope path denotes the project root.",
+      "type": "object",
+      "properties": {
+        "packageDirectories": {
+          "description": "The `path` of every entry of `packageDirectories`.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "unpackagedMetadata": {
+          "description": "The `unpackagedMetadata.path` of every entry of `packageDirectories` that has one.",
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["packageDirectories", "unpackagedMetadata"],
+      "additionalProperties": false
+    },
+    "provenance_config": {
+      "description": "A hash of the config as it takes effect, not of the file sf-impact.json as it is written: 16 hexadecimal digits in lower case, the FNV-1a hash of 64 bits of the UTF-8 text `{\"namespaces\":[..],\"textualAllowList\":[..],\"textualMinLength\":n}`, written without white space, each list with its names in ASCII lower case, sorted by their bytes, each once. So a tree with no config file, one with `{}` and one that states the defaults all hash as `4e7844462778448c`, and keys that are for other tools change nothing. It tells two configs apart. It is no protection against a file made to deceive, and neither is the rest of the row.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "commit": {
+      "description": "One of the two commits that were compared. There are two such rows, the base first.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "commit" },
+        "side": {
+          "description": "`base`: the commit compared from. `head`: the commit compared to.",
+          "enum": ["base", "head"]
+        },
+        "id": {
+          "description": "The full id of the commit. For the base given with `--merge-base`, the merge base that was found.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "project_file": {
+          "description": "The id of the blob that is `sfdx-project.json` at the root of the project in this commit, or null if the commit has no such file. Given whether or not the file differs between the two commits, with a `blob` row for its text: what is in scope at each commit is read from it.",
+          "oneOf": [{ "$ref": "#/$defs/provenance_id" }, { "type": "null" }]
+        },
+        "config_file": {
+          "description": "The id of the blob that is `sf-impact.json` at the root of the project in this commit, or null if the commit has no such file. Given like `project_file`.",
+          "oneOf": [{ "$ref": "#/$defs/provenance_id" }, { "type": "null" }]
+        }
+      },
+      "required": ["row", "side", "id", "project_file", "config_file"],
+      "additionalProperties": false
+    },
+    "delta_file": {
+      "description": "A file that is not the same in the two commits: one row for every such file of the repository, inside the project or not. A file is a path with what a tree has at it, which is never a directory: a file with content, a symbolic link or a submodule. No two files are taken for one because they are alike: a path that only the base has is a file deleted and a path that only the head has is a file added. The one exception needs no judgement: the very same blob under another path is the file moved.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "file" },
+        "status": {
+          "description": "`added`: at head only; `base` is null. `deleted`: at base only; `head` is null. `modified`: at the same path in both, as another blob, with another mode, or both; a change of mode alone has the same `id` on both sides, and a file that became a link, or the reverse, another `mode`. `moved`: a path that only the base has and a path that only the head has, with the same `id` and as the same kind of thing: the content did not change. Where several such paths have one blob, those with the same file name are paired first, and the rest in the order of their paths; what is left over is `deleted` or `added`. A file that moved and changed is one `deleted` and one `added`. A row whose `base` and `head` are not those its status has is no row of this file, and `sf-impact-changed` refuses a delta that has one.",
+          "$ref": "#/$defs/delta_status"
+        },
+        "base": {
+          "description": "The file at base: null for an `added` file, and there for every other.",
+          "oneOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
+        },
+        "head": {
+          "description": "The file at head: null for a `deleted` file, and there for every other.",
+          "oneOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
+        },
+        "hunks": {
+          "description": "The lines that differ, in the order of the file. Present for a `modified` file whose content changed and whose two versions are both files of text: neither is `binary`, a symbolic link or a submodule. Absent otherwise: an added, deleted or moved file has no other version to differ from, and a binary version has no lines.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/hunk" },
+          "minItems": 1
+        },
+        "new_directory": {
+          "description": "Present for a file whose path at head the base does not have, added or moved, if it came with a directory: the topmost directory on that path that the base does not have either, relative to the root like a path. Absent where the base has the directory the file is in. A file added as `app/lwc/refund/refund.js` to a base that has `app/lwc` says `app/lwc/refund`.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["row", "status", "base", "head"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "added" } } },
+          "then": { "properties": { "base": { "type": "null" }, "head": { "$ref": "#/$defs/version" } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "deleted" } } },
+          "then": { "properties": { "base": { "$ref": "#/$defs/version" }, "head": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "status": { "enum": ["modified", "moved"] } } },
+          "then": { "properties": { "base": { "$ref": "#/$defs/version" }, "head": { "$ref": "#/$defs/version" } } }
+        }
+      ]
+    },
+    "version": {
+      "description": "A file as one commit has it.",
+      "type": "object",
+      "properties": {
+        "file": {
+          "description": "The path of the file relative to the root of the project, with `/` separators and as it is, whatever characters it has. It is UTF-8: a commit that has a file whose path is not is refused by `sf-impact-delta`, which writes no path it would have to change. A file of the repository that is outside the root, where the project is not at the top of its repository, starts with `../`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "description": "The id of the blob that is the content of the file; for a symbolic link the blob that says where it leads, and for a submodule the commit it is at.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "mode": {
+          "description": "The mode of the tree entry, as git writes it: `100644` for a file, `100755` for one that can be executed, `120000` for a symbolic link, `160000` for a submodule. A link is not followed and a submodule is not read: neither has `hunks` or a `blob` row.",
+          "type": "string",
+          "minLength": 6
+        },
+        "binary": {
+          "description": "True for a regular file that is not text; false for text, a symbolic link and a submodule. A file is text if and only if it is valid UTF-8, or UTF-16 (LE or BE) with a BOM that decodes without error, and the decoded content contains no NUL (U+0000). An optional UTF-8 BOM is preserved; a UTF-16 BOM is removed. The lines of a binary file are not compared.",
+          "type": "boolean"
+        }
+      },
+      "required": ["file", "id", "mode", "binary"],
+      "additionalProperties": false
+    },
+    "hunk": {
+      "description": "A run of lines that differ between the base and the head version of a file, without context: what `git diff` writes as `@@ -base_start,base_lines +head_start,head_lines @@`. A line is everything up to and including its line feed, and two lines are the same only if they are the same bytes: nothing is ignored, a line that ends in CRLF is not the line that ends in LF, and a last line without a line end is not that line with one. The comparison is Myers' algorithm with the indent heuristic, as git compares by default: where a run of added or removed lines could sit in more than one place, it sits where the indentation says a block starts.",
+      "type": "object",
+      "properties": {
+        "base_start": {
+          "description": "First line of the hunk at base, counting from 1. Where `base_lines` is 0 the hunk only adds lines, and this is the line at base that they come after: 0 for the top of the file.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        },
+        "base_lines": {
+          "description": "How many lines at base the hunk replaces or takes away.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        },
+        "head_start": {
+          "description": "First line of the hunk at head, counting from 1. Where `head_lines` is 0 the hunk only takes lines away, and this is the line at head that they came after: 0 for the top of the file.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        },
+        "head_lines": {
+          "description": "How many lines at head the hunk changes or adds.",
+          "type": "integer",
+          "minimum": 0, "maximum": 4294967295
+        }
+      },
+      "required": ["base_start", "base_lines", "head_start", "head_lines"],
+      "additionalProperties": false
+    },
+    "blob": {
+      "description": "The content of a blob that is text. There is one row for each blob that is a version of a file in a `file` row, or a `project_file` or `config_file`, and is text; each blob once, however many files it is. A file is text if and only if it is valid UTF-8, or UTF-16 (LE or BE) with a BOM that decodes without error, and the decoded content contains no NUL (U+0000). An optional UTF-8 BOM is preserved; a UTF-16 BOM is removed. A blob that is not text has no row, nor has a symbolic link or a submodule. A version without a row cannot be read by the stage after this, which says so.",
+      "type": "object",
+      "properties": {
+        "row": { "const": "blob" },
+        "id": {
+          "description": "The id of the blob: the `id` of a version, or a `project_file` or `config_file`.",
+          "$ref": "#/$defs/provenance_id"
+        },
+        "text": {
+          "description": "The content, whole. A file is text if and only if it is valid UTF-8, or UTF-16 (LE or BE) with a BOM that decodes without error, and the decoded content contains no NUL (U+0000). An optional UTF-8 BOM is preserved; a UTF-16 BOM is removed.",
+          "type": "string"
+        }
+      },
+      "required": ["row", "id", "text"],
+      "additionalProperties": false
+    },
+    "provenance_id": {
+      "description": "The id of a git object, in full: 40 hexadecimal digits, or 64 in a repository that uses SHA-256.",
+      "type": "string",
+      "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$"
+    }
+  }
+}

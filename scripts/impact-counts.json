@@ -1,0 +1,112 @@
+{
+  "description": "GNU grep occurrence counts and sf-impact-tests direct reference-row counts. All 203 differing file/line tuples are explained in impact-accepted.tsv. Pins and hand-selected words are in impact-symbols.json. Owner binding and upward dispatch can add direct sites whose spelling differs from the queried symbol.",
+  "queries": [
+    {
+      "corpus": "NebulaLogger",
+      "query": "SlackLoggerPlugin.sendAsyncSlackNotifications()",
+      "seed": "SlackLoggerPlugin.sendAsyncSlackNotifications()",
+      "grep": 2,
+      "parsed": 2,
+      "textual": 3
+    },
+    {
+      "corpus": "NebulaLogger",
+      "query": "LoggerPlugin__mdt",
+      "seed": "LoggerPlugin__mdt",
+      "grep": 165,
+      "parsed": 131,
+      "textual": 165
+    },
+    {
+      "corpus": "NebulaLogger",
+      "query": "Logger_Recipes_Flow_Screen_Demos",
+      "seed": "Logger_Recipes_Flow_Screen_Demos",
+      "grep": 3,
+      "parsed": 0,
+      "textual": 3
+    },
+    {
+      "corpus": "apex-rollup",
+      "query": "RollupCustomObjectLogger",
+      "seed": "RollupCustomObjectLogger",
+      "grep": 28,
+      "parsed": 32,
+      "textual": 28
+    },
+    {
+      "corpus": "apex-rollup",
+      "query": "RollupCustomObjectLogger",
+      "seed": "RollupCustomObjectLogger.RollupCustomObjectLogger()",
+      "grep": 13,
+      "parsed": 3,
+      "textual": 13
+    },
+    {
+      "corpus": "apex-rollup",
+      "query": "RollupCustomObjectLogger",
+      "seed": "RollupPlugin.RollupCustomObjectLogger",
+      "grep": 13,
+      "parsed": 2,
+      "textual": 13
+    },
+    {
+      "corpus": "apex-rollup",
+      "query": "RollupOrderBy__mdt.Rollup__c",
+      "seed": "RollupOrderBy__mdt.Rollup__c",
+      "grep": 7,
+      "parsed": 8,
+      "textual": 7
+    },
+    {
+      "corpus": "apex-rollup",
+      "query": "rollupJobPoller",
+      "seed": "rollupJobPoller",
+      "grep": 5,
+      "parsed": 3,
+      "textual": 5
+    },
+    {
+      "corpus": "apex-recipes",
+      "query": "StubExample.setGreeting",
+      "seed": "StubExample.setGreeting(Integer)",
+      "grep": 31,
+      "parsed": 3,
+      "textual": 31
+    },
+    {
+      "corpus": "apex-recipes",
+      "query": "StubExample.setGreeting",
+      "seed": "StubExample.setGreeting(String)",
+      "grep": 31,
+      "parsed": 3,
+      "textual": 31
+    },
+    {
+      "corpus": "apex-recipes",
+      "query": "FilesRecipes.createFileAttachedToRecord",
+      "seed": "FilesRecipes.createFileAttachedToRecord(Blob,Id,String)",
+      "grep": 12,
+      "parsed": 4,
+      "textual": 12
+    },
+    {
+      "corpus": "apex-recipes",
+      "query": "FilesRecipes.createFileAttachedToRecord",
+      "seed": "FilesRecipes.createFileAttachedToRecord(FilesRecipes.FileAndLinkObject)",
+      "grep": 12,
+      "parsed": 0,
+      "textual": 12
+    },
+    {
+      "corpus": "apex-recipes",
+      "query": "CustomMetadataUtilties",
+      "seed": "CustomMetadataUtilties",
+      "grep": 16,
+      "parsed": 5,
+      "textual": 16
+    }
+  ],
+  "differences": 203,
+  "unexplained": 0,
+  "stale_explanations": 0
+}

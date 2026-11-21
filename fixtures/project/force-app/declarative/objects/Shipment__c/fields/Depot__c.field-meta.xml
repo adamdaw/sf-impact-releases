@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Depot__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Depot</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>1 AND 2</booleanFilter>
+        <filterItems>
+            <field>Carrier__c.Region__c</field>
+            <operation>equals</operation>
+            <valueField>$Source.Kg__c</valueField>
+        </filterItems>
+        <filterItems>
+            <field>Carrier__c.Name</field>
+            <operation>notEqual</operation>
+            <value>Retired</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Carrier__c</referenceTo>
+    <relationshipName>Depot_Shipments</relationshipName>
+    <type>Lookup</type>
+</CustomField>

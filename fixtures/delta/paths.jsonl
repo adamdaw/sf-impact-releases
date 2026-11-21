@@ -1,0 +1,8 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"c8698713e947a902d718b7073f3bd1ab366e30a1","head":"3f5b94834db7f8f1fa75a199b760f50c685a0438","head_tree":"e3213f7570e252a06dd0284e71078370b340ee7c","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"c8698713e947a902d718b7073f3bd1ab366e30a1","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"3f5b94834db7f8f1fa75a199b760f50c685a0438","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"added","base":null,"head":{"file":"app/expédition/Colis.cls","id":"87ea4fc046e3c7d8c5413c0a8e708799e4c028ff","mode":"100644","binary":false},"new_directory":"app/expédition"}
+{"row":"file","status":"added","base":null,"head":{"file":"app/shipping area/Parcel \"one\".cls","id":"cc653007cfb46533a11adb4d94645903a3e86504","mode":"100644","binary":false},"new_directory":"app/shipping area"}
+{"row":"blob","id":"87ea4fc046e3c7d8c5413c0a8e708799e4c028ff","text":"public class Colis {\n}\n"}
+{"row":"blob","id":"cc653007cfb46533a11adb4d94645903a3e86504","text":"public class Parcel {\n}\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

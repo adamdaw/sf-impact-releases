@@ -1,0 +1,8 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"c8698713e947a902d718b7073f3bd1ab366e30a1","head":"2c0d1b4fcd7944eef031eb648713f6f70dcea344","head_tree":"f2923648da9079563c810551dfbc2b8c2ffd19fb","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"c8698713e947a902d718b7073f3bd1ab366e30a1","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"2c0d1b4fcd7944eef031eb648713f6f70dcea344","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"deleted","base":{"file":"app/classes/Alpha.cls","id":"5e40eefd89100a50904c0fc706c23b51631c6482","mode":"100644","binary":false},"head":null}
+{"row":"file","status":"added","base":null,"head":{"file":"app/classes/Beta.cls","id":"fe7353ecaf25f1d6907c425e11a8d099db190dec","mode":"100644","binary":false}}
+{"row":"blob","id":"5e40eefd89100a50904c0fc706c23b51631c6482","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 2;\n    }\n}\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}
+{"row":"blob","id":"fe7353ecaf25f1d6907c425e11a8d099db190dec","text":"public class Beta {\n}\n"}

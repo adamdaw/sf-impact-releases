@@ -1,0 +1,6 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"c8698713e947a902d718b7073f3bd1ab366e30a1","head":"d7f43201747b238e07e45c700fa392444a330625","head_tree":"d07b444f4a966a7be486b5dbd06d168d00626121","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"c8698713e947a902d718b7073f3bd1ab366e30a1","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"d7f43201747b238e07e45c700fa392444a330625","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"added","base":null,"head":{"file":"app/image.png","id":"029ace0fcbb58feb758971feed0457fd34dbb60b","mode":"100644","binary":true}}
+{"row":"file","status":"added","base":null,"head":{"file":"app/latin1.txt","id":"6f83395d973c448cdb70a7b21f7fc8018797acf6","mode":"100644","binary":true}}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

@@ -1,0 +1,9 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"01d9e94c2f99296e5741f70e14d510514c1c7a1a","head":"af4d4523d3ec4feb9d4886d65c6814308d72bfe3","head_tree":"fa789dc5002fc9fedd343ffefb0c0eb2d4f9f539","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"01d9e94c2f99296e5741f70e14d510514c1c7a1a","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"af4d4523d3ec4feb9d4886d65c6814308d72bfe3","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"modified","base":{"file":"app/becomes-not-text.dat","id":"8e27be7d6154a1f68ea9160ef0e18691d20560dc","mode":"100644","binary":false},"head":{"file":"app/becomes-not-text.dat","id":"6f83395d973c448cdb70a7b21f7fc8018797acf6","mode":"100644","binary":true}}
+{"row":"file","status":"modified","base":{"file":"app/late-nul.dat","id":"430de4da541674841e13fc647663f54cc00b58d0","mode":"100644","binary":true},"head":{"file":"app/late-nul.dat","id":"99a6e5a8c4322f0764b39ae7467e19bfc08c33b5","mode":"100644","binary":true}}
+{"row":"file","status":"modified","base":{"file":"app/stays-not-text.dat","id":"87567b02ae0cf3d979dc9bfc99c6b248b7ae8dfd","mode":"100644","binary":true},"head":{"file":"app/stays-not-text.dat","id":"6f83395d973c448cdb70a7b21f7fc8018797acf6","mode":"100644","binary":true}}
+{"row":"file","status":"modified","base":{"file":"app/was-not-text.dat","id":"24eab6ba3d45e4794aa96317e813b778c5a344f6","mode":"100644","binary":true},"head":{"file":"app/was-not-text.dat","id":"8e27be7d6154a1f68ea9160ef0e18691d20560dc","mode":"100644","binary":false}}
+{"row":"blob","id":"8e27be7d6154a1f68ea9160ef0e18691d20560dc","text":"text\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

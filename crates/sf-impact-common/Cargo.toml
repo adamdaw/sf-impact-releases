@@ -1,0 +1,24 @@
+[package]
+name = "sf-impact-common"
+description.workspace = true
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+foldhash.workspace = true
+libmimalloc-sys.workspace = true
+# musl builds take its memcmp and bcmp in place of musl's.
+sf-impact-memcmp = { path = "../sf-impact-memcmp" }
+imara-diff = { version = "=0.2.0", default-features = false }
+serde.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
+# The refs pack's checksum. RustCrypto, as for blob ids in sf-impact-extract.
+sha2 = { version = "0.11", default-features = false }
+# Pinned: a pack's bytes are a function of its content only for one build of
+# the compressor, so a new version is a reviewed change.
+zstd = { version = "=0.14.4", default-features = false }

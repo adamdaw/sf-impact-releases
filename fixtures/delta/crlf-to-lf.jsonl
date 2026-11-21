@@ -1,0 +1,7 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"ffe850b08c29c89e7cb05ee6842fbf35557efdd1","head":"a3a798fb13ed560818a2fb0c8a94bf3ec8ffe6ea","head_tree":"7a8129eda844f240faf48bf0ec4f96d2955eee10","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"ffe850b08c29c89e7cb05ee6842fbf35557efdd1","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"a3a798fb13ed560818a2fb0c8a94bf3ec8ffe6ea","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"modified","base":{"file":"app/classes/Alpha.cls","id":"0eb05ff27639bbdd7b1ccc6bd31271d1e63adb38","mode":"100644","binary":false},"head":{"file":"app/classes/Alpha.cls","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","mode":"100644","binary":false},"hunks":[{"base_start":1,"base_lines":9,"head_start":1,"head_lines":9}]}
+{"row":"blob","id":"0eb05ff27639bbdd7b1ccc6bd31271d1e63adb38","text":"public class Alpha {\r\n    public Integer first() {\r\n        return 1;\r\n    }\r\n\r\n    public Integer second() {\r\n        return 2;\r\n    }\r\n}\r\n"}
+{"row":"blob","id":"deda8de4ec1f53c8233dc95495ecfa0c662a87a1","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 20;\n    }\n}\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}

@@ -1,0 +1,10 @@
+{"row":"provenance","tool":"sf-impact-delta","version":"0.1.0","schema":1,"base":"c8698713e947a902d718b7073f3bd1ab366e30a1","head":"d365bac0c0fca01dbbc4e7b569a26a4c85875ae9","head_tree":"7c3decba53c4c3673289f9e7c03e3791f0f865e0","root":".","scope":{"packageDirectories":["app"],"unpackagedMetadata":[]},"config":"4e7844462778448c"}
+{"row":"commit","side":"base","id":"c8698713e947a902d718b7073f3bd1ab366e30a1","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"commit","side":"head","id":"d365bac0c0fca01dbbc4e7b569a26a4c85875ae9","project_file":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","config_file":null}
+{"row":"file","status":"moved","base":{"file":"app/classes/Alpha.cls","id":"5e40eefd89100a50904c0fc706c23b51631c6482","mode":"100644","binary":false},"head":{"file":"app/billing/core/Alpha.cls","id":"5e40eefd89100a50904c0fc706c23b51631c6482","mode":"100644","binary":false},"new_directory":"app/billing"}
+{"row":"file","status":"added","base":null,"head":{"file":"app/classes/Beta.cls","id":"fe7353ecaf25f1d6907c425e11a8d099db190dec","mode":"100644","binary":false}}
+{"row":"file","status":"added","base":null,"head":{"file":"app/lwc/refund/__tests__/data/one.json","id":"0967ef424bce6791893e9a57bb952f80fd536e93","mode":"100644","binary":false},"new_directory":"app/lwc"}
+{"row":"blob","id":"0967ef424bce6791893e9a57bb952f80fd536e93","text":"{}\n"}
+{"row":"blob","id":"5e40eefd89100a50904c0fc706c23b51631c6482","text":"public class Alpha {\n    public Integer first() {\n        return 1;\n    }\n\n    public Integer second() {\n        return 2;\n    }\n}\n"}
+{"row":"blob","id":"e5ef933bb31684a391bd6dfa2eef364b677a8cff","text":"{\"packageDirectories\": [{\"path\": \"app\"}]}\n"}
+{"row":"blob","id":"fe7353ecaf25f1d6907c425e11a8d099db190dec","text":"public class Beta {\n}\n"}
