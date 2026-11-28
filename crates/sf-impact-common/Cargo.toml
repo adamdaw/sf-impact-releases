@@ -21,4 +21,4 @@ serde_json = { workspace = true, features = ["raw_value"] }
 sha2 = { version = "0.11", default-features = false }
 # Pinned: a pack's bytes are a function of its content only for one build of
 # the compressor, so a new version is a reviewed change.
-zstd = { version = "=0.14.4", default-features = false }
+zstd = { version = "=0.14.5", default-features = false }

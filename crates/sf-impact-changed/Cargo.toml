@@ -16,7 +16,7 @@ sf-impact-common = { path = "../sf-impact-common" }
 sf-impact-extract = { path = "../sf-impact-extract" }
 
 [dev-dependencies]
-zstd = { version = "=0.14.4", default-features = false }
+zstd = { version = "=0.14.5", default-features = false }
 # The pack tests reseal a pack that they alter.
 sha2 = { version = "0.11", default-features = false }
 jsonschema = { version = "=0.33.0", default-features = false }
